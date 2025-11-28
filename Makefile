@@ -8,12 +8,12 @@ CPPFLAGS = -Wall -Wextra -pedantic
 
 LFLAGS = $(#linker flags)
 
-objects = c-review.o
+objects = rk4.o
 c-review: $(objects)
-	$(CC) -o c-review $(objects) $(CFLAGS)
+	$(CC) -o rk4.c $(objects) $(CFLAGS)
 c-review.o: c-review.c
-	$(CC) -O2 -c c-review.c
+	$(CC) -O2 -c rk4.c
 
 .PHONY: clean 
 clean:
-	rm c-review $(objects)
+	rm rk4 $(objects)
