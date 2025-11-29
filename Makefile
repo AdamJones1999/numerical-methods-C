@@ -1,18 +1,18 @@
 # Author: Adam Jones
 
 CC = gcc # c compiler used
-CFLAGS = -g  # compiler flags
+CFLAGS = -g  # compiler flags (-g: enable debugging)
 LIBS = # syntax: -l<lib_name> (omit <>)
 LIB_DIRS = # syntax: -L<dir> (omit <>)
-CPPFLAGS = -Wall -Wextra -pedantic
+CPPFLAGS = -O2 -Wall -Wextra -pedantic
 
-LFLAGS = $(#linker flags)
+LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
 
 objects = rk4.o
-c-review: $(objects)
-	$(CC) -o rk4.c $(objects) $(CFLAGS)
-c-review.o: c-review.c
-	$(CC) -O2 -c rk4.c
+rk4: $(objects)
+	$(CC) -o rk4 $(objects)
+rk4.o: rk4.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) rk4.c
 
 .PHONY: clean 
 clean:
