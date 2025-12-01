@@ -11,7 +11,7 @@ LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
 objects = eulermethod.o
 eulermethod: $(objects)
 	$(CC) -o eulermethod $(objects)
-eulermethod.o: eulermethod.c
+eulermethod.o: eulermethod.c nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) eulermethod.c
 
 .PHONY: clean 
