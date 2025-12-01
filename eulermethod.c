@@ -15,10 +15,16 @@ arguments:
 	N: number of elements in t[].
 preconditions:
 	x[]: must contain initial value x[0] for the euler method to start with. 
+	t[]: must contain N elements of elements all with the same difference 
+	bewteen adjacent elements.
+	dt: must equal the difference between each element in t.
 returns: 
 	x: pointer to array containing solution.
 */
-float *eulermethod(float (*f)(float), float x[], float t[], uint N) {
-
+float *eulermethod(float (*f)(float), float x[], float t[], float dt, uint N) {
+	int i;
+	for (i=0; i<N-1, i++) {
+		x[i+1] = x[i] + f(t) * dt;
+	} 
 	return x;	
 }
