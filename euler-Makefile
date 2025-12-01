@@ -1,0 +1,19 @@
+# Author: Adam Jones
+
+CC = gcc # c compiler used
+CFLAGS = -g  # compiler flags (-g: enable debugging)
+LIBS = # syntax: -l<lib_name> (omit <>)
+LIB_DIRS = # syntax: -L<dir> (omit <>)
+CPPFLAGS = -O2 -Wall -Wextra -pedantic
+
+LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
+
+objects = eulermethod.o
+eulermethod: $(objects)
+	$(CC) -o eulermethod $(objects)
+eulermethod.o: eulermethod.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) eulermethod.c
+
+.PHONY: clean 
+clean:
+	rm eulermethod $(objects)
