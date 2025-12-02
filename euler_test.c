@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "nummethods.h"
 
 /*
 @description: 
@@ -16,9 +17,9 @@ to arrays as arguments.
 */
 float simpleODE1(float t, float r[], uint N_r) {
 	float k; // dr/dt
-	float dummy = t; // suppresses unused param warning
+	(void)t; // cast to void to suppresses unused param warning
 	if (N_r != 1) {
-		fprintf( stderr, "ERROR: Given %d dependent var values, should be 1.", N_r);
+		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_r);
 		exit(1);
 	}
 	else {
@@ -28,5 +29,22 @@ float simpleODE1(float t, float r[], uint N_r) {
 }
 
 int main() {
+	// ======== testing euler_method() ========
+	fprintf(stdout, "IN MAIN\n\n");
+	
+	uint N_t = 5;
+	uint N_r = 1;
+	float *t = (float *) malloc(N_t * sizeof(float));
+	float *r = (float *) malloc(N_t * N_r * sizeof(float));
+	uint i;
+	for (i=0; i<N_t; i++) {
+		t[i] = i+1;
+	}
+	r[0] = 0;
+	float dt = 1;
+	euler_method(simpleODE1, r, t, dt, N_t, N_r);
+	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
+	free(t);
+	free(r);
 	return 0;
 }
