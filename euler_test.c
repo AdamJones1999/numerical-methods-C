@@ -40,7 +40,7 @@ int main() {
 	for (i=0; i<N_t; i++) {
 		t[i] = i+1;
 	}
-	r[0] = 0;
+	r[0] = 1;
 	float dt = 1;
 	euler_method(simpleODE1, r, t, dt, N_t, N_r);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
