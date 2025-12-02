@@ -7,13 +7,16 @@ LIB_DIRS = # syntax: -L<dir> (omit <>)
 CPPFLAGS = -O2 -Wall -Wextra -pedantic
 
 LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
+SRC_DIR = .
 
-objects = rk4.o
-rk4: $(objects)
-	$(CC) -o rk4 $(objects)
-rk4.o: rk4.c
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) rk4.c
+objects = euler_method.o euler_test.o
+euler_method: $(objects)
+	$(CC) -o euler_test $(objects)
+euler_test.o: $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_test.c
+euler_method.o: $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_method.c
 
 .PHONY: clean 
 clean:
-	rm rk4 $(objects)
+	rm euler_test $(objects)
