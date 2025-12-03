@@ -7,7 +7,10 @@ LIB_DIRS = # syntax: -L<dir> (omit <>)
 CPPFLAGS = -O2 -Wall -Wextra -pedantic
 
 LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
-INCLUDE_DIRS = -I.
+# directories to search for header files, libraries, 
+# and parts of compiler. All during preprocessing.
+# makes nummethods.h, etc. considered system headers by compiler.
+INCLUDE_DIRS = -I. 
 SRC_DIR = .
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -27,13 +30,11 @@ $(TARGET): $(OBJS)
 
 $(OBJ_DIR)/euler_test.o: $(SRC_DIR)/euler_test.c $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_test.c \
--o $(OBJ_DIR)/euler_test.o 
-#$(INCLUDE_DIRS)
+-o $(OBJ_DIR)/euler_test.o $(INCLUDE_DIRS)
 
 $(OBJ_DIR)/euler_method.o: $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_method.c \
--o $(OBJ_DIR)/euler_method.o 
-#$(INCLUDE_DIRS)
+-o $(OBJ_DIR)/euler_method.o $(INCLUDE_DIRS)
 
 .PHONY: clean 
 clean:
