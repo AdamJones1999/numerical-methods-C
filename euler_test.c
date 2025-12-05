@@ -31,7 +31,7 @@ float simpleODE1(float t, float r[], uint N_r) {
 int main() {
 	// ======== testing euler_method() ========
 	fprintf(stdout, "IN MAIN\n\n");
-	
+	char *fn = "test.data";
 	uint N_t = 5;
 	uint N_r = 1;
 	float *t = (float *) malloc(N_t * sizeof(float));
@@ -44,7 +44,12 @@ int main() {
 	float dt = 1;
 	euler_method(simpleODE1, r, t, dt, N_t, N_r);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
-	free(t);
-	free(r);
+	if (write_to_bin(r, 5, 1, fn) == 0) {
+		free(t);
+		free(r);
+	}
+	else {
+		printf("writing to %s failed\n", fn);
 	return 0;
+	}
 }
