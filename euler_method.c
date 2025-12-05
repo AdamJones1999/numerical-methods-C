@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <nummethods.h>
 
@@ -8,27 +9,28 @@ float *euler_method(float (*x_prime)(float, float *, uint), float x[], float t[]
 	for (i=0; i<N_t-1; i++) {
 		x[i+1] = x[i] + x_prime(t[i], &x[i], N_x) * dt;
 	} 
-	return x;	
+	return x;
 }
 
-int to_csv(float *, dims, char name[]) {
+int write_to_bin(float *data, uint N, uint dims, char fname[]) {
 	FILE *fp;
-	if ((fp = fopen(name, 'a')) == NULL) {
-		printf("cannot open file: %s", name);
+	if ((fp = fopen(fname, "w")) == NULL) {
+		printf("cannot open file: %s", fname);
+		return -1;
 	}
 	else {
 		if (dims == 1) {
-
+			fwrite(data, sizeof(float), (size_t) N, fp);
+			fclose(fp);
+			return 0;
 		}
 		else if (dims == 2) {
-			printf("support for writing 2D data is coming soon"\n);
+			printf("support for writing 2D data is coming soon.\n");
 			return -1;
 		}
 		else {
-			printf("writing %d dimension data to a .csv not supported.\n");
+			printf("writing %d dimension data to a .csv not supported.\n", dims);
 			return -1;
 		}
 	}
-	fclose(FILE *fp);
-	return 0;
 }
