@@ -25,3 +25,18 @@ numerical derivative.
 	x: pointer to array containing solution.
 */
 float *euler_method(float (*x_prime)(float, float *, uint), float x[], float t[], float dt, uint N_t, uint N_x);
+
+/*
+@description:
+	writes 1D array data (2D support coming soon) to a 
+little endian binary file.
+
+@params:
+	data: pointer to data array.
+	dims: number of dimensions in data.
+	fname: string of desired name of file.
+
+@return:
+	0 if successful, -1 if not. 
+*/
+int write_to_bin(float * data, uint N, uint dims, char fname[]);
