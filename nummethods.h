@@ -24,7 +24,7 @@ numerical derivative.
 @return: 
 	x: pointer to array containing solution.
 */
-float *euler_method(float (*x_prime)(float, float *, uint), float x[], float t[], float dt, uint N_t, uint N_x);
+double *euler_method(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x);
 
 /*
 @description:
