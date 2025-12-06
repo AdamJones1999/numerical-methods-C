@@ -23,18 +23,18 @@ all: make-dir $(TARGET)
 make-dir:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR)
 
-OBJS = $(OBJ_DIR)/euler_method.o $(OBJ_DIR)/euler_test.o
+OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/euler_test.o
 
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS)
 
-$(OBJ_DIR)/euler_test.o: $(SRC_DIR)/euler_test.c $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
+$(OBJ_DIR)/euler_test.o: $(SRC_DIR)/euler_test.c $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_test.c \
 -o $(OBJ_DIR)/euler_test.o $(INCLUDE_DIRS)
 
-$(OBJ_DIR)/euler_method.o: $(SRC_DIR)/euler_method.c $(SRC_DIR)/nummethods.h
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_method.c \
--o $(OBJ_DIR)/euler_method.o $(INCLUDE_DIRS)
+$(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods.c \
+-o $(OBJ_DIR)/nummethods.o $(INCLUDE_DIRS)
 
 .PHONY: clean 
 clean:
