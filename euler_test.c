@@ -15,8 +15,8 @@ to arrays as arguments.
 @return:
 	k: calculated dr/dt.
 */
-float simpleODE1(float t, float r[], uint N_r) {
-	float k; // dr/dt
+double simpleODE1(double t, double r[], uint N_r) {
+	double k; // dr/dt
 	(void)t; // cast to void to suppresses unused param warning
 	if (N_r != 1) {
 		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_r);
@@ -34,14 +34,14 @@ int main() {
 	char *fn = "test.data";
 	uint N_t = 5;
 	uint N_r = 1;
-	float *t = (float *) malloc(N_t * sizeof(float));
-	float *r = (float *) malloc(N_t * N_r * sizeof(float));
+	double *t = (double *) malloc(N_t * sizeof(double));
+	double *r = (double *) malloc(N_t * N_r * sizeof(double));
 	uint i;
 	for (i=0; i<N_t; i++) {
 		t[i] = i+1;
 	}
 	r[0] = 1;
-	float dt = 1;
+	double dt = 1;
 	euler_method(simpleODE1, r, t, dt, N_t, N_r);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
 	if (write_to_bin(r, 5, 1, fn) == 0) {
