@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <nummethods.h>
 
-float *euler_method(float (*x_prime)(float, float *, uint), float x[], float t[], float dt, uint N_t, uint N_x) {
+double *euler_method(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x) {
 	uint i;
 	// compute solution values up to index N
 	for (i=0; i<N_t-1; i++) {
@@ -12,7 +12,7 @@ float *euler_method(float (*x_prime)(float, float *, uint), float x[], float t[]
 	return x;
 }
 
-int write_to_bin(float *data, uint N, uint dims, char fname[]) {
+int write_to_bin(double *data, uint N, uint dims, char fname[]) {
 	FILE *fp;
 	if ((fp = fopen(fname, "w")) == NULL) {
 		printf("cannot open file: %s", fname);
@@ -20,7 +20,7 @@ int write_to_bin(float *data, uint N, uint dims, char fname[]) {
 	}
 	else {
 		if (dims == 1) {
-			fwrite(data, sizeof(float), (size_t) N, fp);
+			fwrite(data, sizeof(double), (size_t) N, fp);
 			fclose(fp);
 			return 0;
 		}
