@@ -39,4 +39,4 @@ little endian binary file.
 @return:
 	0 if successful, -1 if not. 
 */
-int write_to_bin(float * data, uint N, uint dims, char fname[]);
+int write_to_bin(double * data, uint N, uint dims, char fname[]);
