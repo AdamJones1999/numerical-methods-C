@@ -16,12 +16,13 @@ BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj
 BIN_DIR = $(BUILD_DIR)/bin
 LIB_DIR = $(BUILD_DIR)/lib
+DATA_DIR = ./data
 
 TARGET = $(BIN_DIR)/euler_test
 
 all: make-dir $(TARGET)
 make-dir:
-	mkdir -p $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR)
+	mkdir -p $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR) $(DATA_DIR)
 
 OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/euler_test.o
 
@@ -36,6 +37,8 @@ $(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods.c \
 -o $(OBJ_DIR)/nummethods.o $(INCLUDE_DIRS)
 
-.PHONY: clean 
+.PHONY: clean clean_data
 clean:
 	rm -r $(BUILD_DIR)
+clean_data:
+	rm -r $(DATA_DIR)
