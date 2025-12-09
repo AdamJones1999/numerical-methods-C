@@ -14,7 +14,7 @@ double *euler_method(double (*x_prime)(double, double *, uint), double x[], doub
 
 int write_to_bin(double *data, uint N, uint dims, char fname[]) {
 	FILE *fp;
-	if ((fp = fopen(fname, "w")) == NULL) {
+	if ((fp = fopen(fname, "a")) == NULL) {
 		printf("cannot open file: %s", fname);
 		return -1;
 	}
