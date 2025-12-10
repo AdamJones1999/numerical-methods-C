@@ -33,7 +33,7 @@ double *euler_method(double (*x_prime)(double, double *, uint), double x[], doub
 	systems of coupled ODEs.
 	
 */
-double *euler_single(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x);
+double euler_single(double (*x_prime)(double, double *, uint), double r, double t, double dt, uint N_r);
 
 /*
 @description:

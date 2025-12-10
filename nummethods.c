@@ -13,11 +13,10 @@ double *euler_method(double (*x_prime)(double, double *, uint), double x[], doub
 	return x;
 }
 
-double *euler_single(double (*x_prime)(double, double *, uint), double r[], double t, double dt, uint N_r) {
-	uint i;
-	// compute solution values up to index N
-	x[i+1] = x[i] + x_prime(t[i], &x[i], N_x) * dt;
-	return x;
+double euler_single(double (*x_prime)(double, double *, uint), double r, double t, double dt, uint N_r) {
+	double r_next; // next step in soln.
+	r_next = r + x_prime(t, &r, N_r) * dt;
+	return r_next;
 }
 
 int write_to_bin(double *data, uint N, uint dims, char fname[]) {
