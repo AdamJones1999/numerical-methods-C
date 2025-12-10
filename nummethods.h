@@ -4,10 +4,11 @@ function declarations for numerical methods library
 
 /*
 @description:
-	this function implements a numerical derivative using the rk2 
-numerical derivative.
-	equation is of form:
+	this function implements the euler method for solving a 1st order ODE
+	ODE of this form:
 		d(x(t))/dt = f(x(t), t)
+	does not support solving for slopes in coupled systems 
+	(slopes depend on prev slopes from other equations in system of ODEs).
 
 @params:
 	x_prime: pointer to function encoding differential equation. 
@@ -25,6 +26,14 @@ numerical derivative.
 	x: pointer to array containing solution.
 */
 double *euler_method(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x);
+
+/* 
+@description: 
+	computes a single iteration of the euler method. Usable for 
+	systems of coupled ODEs.
+	
+*/
+double *euler_single(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x);
 
 /*
 @description:
