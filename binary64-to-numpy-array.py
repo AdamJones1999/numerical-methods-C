@@ -1,7 +1,10 @@
 import numpy as np
-
+import sys
 from matplotlib import pyplot as plt
-fp = "data/test.data"
+
+#fp = "data/test1.data"
+fp = sys.argv[1]
+print(fp)
 
 data_1d = np.fromfile(fp, dtype=np.float64)
 
