@@ -3,14 +3,16 @@ import sys
 from matplotlib import pyplot as plt
 
 #fp = "data/test1.data"
-fp = sys.argv[1]
+fp = sys.argv[1] #
+rows = int(sys.argv[2]) # rows in data file
+cols = int(sys.argv[3]) # columns data file
 print(fp)
 
 data_1d = np.fromfile(fp, dtype=np.float64)
 
-data_2d = data_1d.reshape((2, 5))
-t = data_2d[0]
-r = data_2d[1]
+data_2d = data_1d.reshape((rows, cols))
+t = data_2d[0] # indep var 
+r = data_2d[1] # dep var
 
 print("t: ")
 print(t)
