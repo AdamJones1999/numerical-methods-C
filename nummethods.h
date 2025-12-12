@@ -12,28 +12,40 @@ function declarations for numerical methods library
 
 @params:
 	TODO: UPDATE TO REFLECT DRDT_ARGS CHANGE
-	x_prime: pointer to function encoding differential equation. 
-	x[]: pointer to array that solution will be put in.
+	drdt: pointer to function encoding differential equation. 
+	r[]: pointer to array that solution will be put in.
 	t[]: pointer to independent variable step array (t as it is usually time)
 	N: number of elements in t[].
-	N_r: number of vars in the ODE.
+	dt: different between t and next independent var value.
+	N_r: number of dependent variables in the ODE system.
 @precond:
 	t[]: must contain N_t elements of elements all with the same difference 
 	bewteen adjacent elements.
-	x[]: must contain initial value x[0] for the euler method to start with. 
+	r[]: must contain initial value x[0] for the euler method to start with. 
 		each variable in x[] must have N_t elements.
-	dt: must equal the difference between each element in t.
 @return: 
-	x: pointer to array containing solution.
+	r: pointer to array containing solution.
 */
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r);
 
 /* 
 @description: 
-	computes a single iteration of the euler method. Usable for 
-	systems of coupled ODEs.
-	TODO: DOCS
+	computes a single iteration of the euler method in place within r[], where 
+	param drdt() is the derivative at t. Suitable in systems of coupled ODEs.
+@params:
+	drdt: func pointer to derivative function.
+	t: independent variable value.
+	r[]: array storing dependent variables.
+	drdt_args[]: array of arguments passed to drdt as 3rd argument.
+	dt: different between t and next independent var value.
+	N_r: number of dependent variables in the ODE system.
+@precond:
+	r[]: must not point to last element in array or last element in row when 
+	there are >1 dependent variables or undefined behaviour will happen due 
+	to this euler method being a type of forward difference method.
+@return:
+	r: pointer to array containing solution.
 */
 double *euler_single(double (*drdt)(double, double *, double *, uint), \
 	double t, double r[], double drdt_args[], double dt, uint N_r);
