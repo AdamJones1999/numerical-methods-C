@@ -11,6 +11,7 @@ function declarations for numerical methods library
 	(slopes depend on prev slopes from other equations in system of ODEs).
 
 @params:
+	TODO: UPDATE TO REFLECT DRDT_ARGS CHANGE
 	x_prime: pointer to function encoding differential equation. 
 	x[]: pointer to array that solution will be put in.
 	t[]: pointer to independent variable step array (t as it is usually time)
@@ -25,18 +26,21 @@ function declarations for numerical methods library
 @return: 
 	x: pointer to array containing solution.
 */
-double *euler_method(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x);
+double *euler_method(double (*drdt)(double, double *, double *, uint), \
+	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r);
 
 /* 
 @description: 
 	computes a single iteration of the euler method. Usable for 
 	systems of coupled ODEs.
-	
+	TODO: DOCS
 */
-double euler_single(double (*x_prime)(double, double *, uint), double r, double t, double dt, uint N_r);
+double *euler_single(double (*drdt)(double, double *, double *, uint), \
+	double t, double r[], double drdt_args[], double dt, uint N_r);
 
 /*
 @description:
+	currently only single var!!
 	writes 1D array data (2D support coming soon) to a 
 little endian binary file.
 
