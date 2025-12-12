@@ -1,7 +1,7 @@
 # Author: Adam Jones
 
 CC = gcc # c compiler used
-CFLAGS = -g  # compiler flags (-g: enable debugging)
+CFLAGS = -g # compiler flags (-g: enable debugging)
 LIBS = # syntax: -l<lib_name> (omit <>)
 LIB_DIRS = # syntax: -L<dir> (omit <>)
 CPPFLAGS = -O2 -Wall -Wextra -pedantic
@@ -39,6 +39,6 @@ $(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 
 .PHONY: clean clean_data
 clean:
-	rm -r $(BUILD_DIR)
-clean_data:
-	rm -r $(DATA_DIR)
+	rm -r $(BUILD_DIR) $(DATA)
+#clean_data:
+#	rm -r $(DATA_DIR)
