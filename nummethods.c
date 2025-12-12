@@ -4,19 +4,22 @@
 #include <nummethods.h>
 
 
-double *euler_method(double (*x_prime)(double, double *, uint), double x[], double t[], double dt, uint N_t, uint N_x) {
+double *euler_method(double (*drdt)(double, double *, double *, uint), \
+	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r) {
 	uint i;
+	(void) drdt_args;
 	// compute solution values up to index N
 	for (i=0; i<N_t-1; i++) {
-		x[i+1] = x[i] + x_prime(t[i], &x[i], N_x) * dt;
+		r[i+1] = r[i] + drdt(t[i], &r[i], &drdt_args[i], N_r) * dt;
 	} 
-	return x;
+	return r;
 }
 
-double euler_single(double (*x_prime)(double, double *, uint), double r, double t, double dt, uint N_r) {
-	double r_next; // next step in soln.
-	r_next = r + x_prime(t, &r, N_r) * dt;
-	return r_next;
+// currently only single var!!
+double *euler_single(double (*drdt)(double, double *, double *, uint), \
+	double t, double r[], double drdt_args[], double dt, uint N_r) {
+	*(r+1) = *r + drdt(t, r, drdt_args, N_r) * dt;
+	return r; 
 }
 
 int write_to_bin(double *data, uint N, uint dims, char fname[]) {
