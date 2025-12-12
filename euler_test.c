@@ -15,8 +15,9 @@ to arrays as arguments.
 @return:
 	k: calculated dr/dt.
 */
-double simpleODE1(double t, double r[], uint N_rvars) {
+double simpleODE1(double t, double r[], double dydt_args[], uint N_rvars) {
 	(void) t;
+	(void) dydt_args;
 	double k; // dr/dt
 	(void)t; // cast to void to suppresses unused param warning
 	if (N_rvars != 1) {
@@ -30,29 +31,32 @@ double simpleODE1(double t, double r[], uint N_rvars) {
 }
 
 // slope calc for y'
-double shoODE_dydt(double t, double y[], uint N_rvars) {
+double shoODE_dydt(double t, double y[], double dydt_args[], uint N_rvars) {
 	(void) t;
+	(void) y;
+	(void) dydt_args;
 	double dydt ; // 1st deriv of y
 	if (N_rvars != 1) {
 		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
 		exit(1);
 	}
 	else {
-		dydt = y[0];
+		dydt = dydt_args[0];
 		return dydt;
 	}
 }
 
-// slope calc for y''
-double shoODE_dydt2(double t, double y[], uint N_rvars) {
+// simple harmonic oscillater y`` + 16y = 0 slope calc for y''
+double shoODE_dydt2(double t, double dydt[], double dydt2_args[], uint N_rvars) {
 	(void) t;
+	(void) dydt;
 	double dydt2; // 2nd deriv of y
 	if (N_rvars != 1) {
 		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
 		exit(1);
 	}
 	else {
-		dydt2 = -16*y[0];
+		dydt2 = -16*dydt2_args[0];
 		return dydt2;
 	}
 }
@@ -75,8 +79,7 @@ int test1() {
 		t[i] = t[i-1]+dt;
 	}
 	r[0] = 1; // initial dep var value for ivp
-
-	euler_method(simpleODE1, r, t, dt, N_t, N_rvars);
+	euler_method(simpleODE1, t, r, NULL, dt, N_t, N_rvars);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
 
 	if (write_to_bin(t, N_t, NDIMS, fn) == 0 && \
@@ -99,12 +102,16 @@ int test2() {
 	uint N_yvars = 1;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
+	// TODO: to save memory, only keep current and next dydt vals.
+	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
+	double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
+	double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
 	// double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
 	// initial conditions
 	y[0] = 1;
-	double dydt_curr = 1;
-	double dydt_next = 0;
-	double dt = 0.01;
+	dydt[0] = 1;
+	//dydt_curr_next[1] = 0;
+	double dt = 0.001;
 	t[0] = 0;
 	uint i;
 	for (i=1; i<N_t; i++) { // init indep var array
@@ -112,16 +119,18 @@ int test2() {
 	}
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
-		y[i+1] = euler_single(shoODE_dydt, y[i], t[i], dt, N_yvars);
-		dydt_next = euler_single( \
-			shoODE_dydt2, dydt_curr, t[i], dt, N_yvars); // calc dydt[i+1]
-		dydt_curr = dydt_next;
+		dydt_args[0] = dydt[i];
+		euler_single(shoODE_dydt, t[i], &y[i], dydt_args, dt, N_yvars);
+		dydt2_args[0] = y[i];
+		euler_single(shoODE_dydt2, t[i], &dydt[i], dydt2_args, dt, N_yvars); // calc dydt[i+1]
 	}
 
 	// write output to file
 	if (write_to_bin(t, N_t, NDIMS, fn) == 0 && write_to_bin(y, N_t, NDIMS, fn) == 0) {
 		free(t);
 		free(y);
+		free(dydt);
+		free(dydt2_args);
 		return 0;
 	}
 	else { 
