@@ -30,7 +30,7 @@ double simpleODE1(double t, double r[], double dydt_args[], uint N_rvars) {
 	}
 }
 
-// slope calc for y'
+// simple harmonic motion y`` + 16y = 0 slope calc for y'
 double shoODE_dydt(double t, double y[], double dydt_args[], uint N_rvars) {
 	(void) t;
 	(void) y;
@@ -46,7 +46,7 @@ double shoODE_dydt(double t, double y[], double dydt_args[], uint N_rvars) {
 	}
 }
 
-// simple harmonic oscillater y`` + 16y = 0 slope calc for y''
+// simple harmonic motion y`` + 16y = 0 slope calc for y''
 double shoODE_dydt2(double t, double dydt[], double dydt2_args[], uint N_rvars) {
 	(void) t;
 	(void) dydt;
@@ -62,7 +62,7 @@ double shoODE_dydt2(double t, double dydt[], double dydt2_args[], uint N_rvars) 
 }
 
 // //////// test 1: simpleODE1 ////////  
-int test1() {
+int euler_basic_ODE() {
 	char *fn = "data/test1.data";
 	uint N_t = 5;
 	uint N_rvars = 1; // num dependent variables
@@ -94,7 +94,7 @@ int test1() {
 	}
 }
 
-int test2() {
+int euler_shm() {
 	// //////// test 2: simple harmonic motion (smhODE) ////////  
 	char *fn = "data/test2.data";
 	uint NDIMS = 1;
@@ -139,14 +139,26 @@ int test2() {
 	}
 }
 
+void run_test(int (*test)(), char *test_name) {
+	if (test() == -1) {
+		printf("test: %s failed\n", test_name);
+	}
+	else {
+		printf("test: %s passed\n", test_name);
+	}
+	return;
+}
+
 int main() {
 	// //////////////// testing euler_method() ////////////////
 
 	// //////// test 1: simpleODE1 ////////  
 	// var decl and init
-	fprintf(stdout, "IN MAIN\n\n");
-	test1();
-	test2();
+
+	// //////////////// START TESING ////////////////
+	
+	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
+	run_test(euler_shm, "simple harmonic motion: y'' + 16y = 0");
 
 	// //////////////// END TESING ////////////////
 	return 0;
