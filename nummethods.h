@@ -50,6 +50,10 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 double *euler_single(double (*drdt)(double, double *, double *, uint), \
 	double t, double r[], double drdt_args[], double dt, uint N_r);
 
+//currently only single var tested
+void rk4_single(double (*drdt)(double, double *, double *, uint), \
+	double t, double r[], double drdt_args[], double dt, uint N_r);
+
 /*
 @description:
 	currently only single var!!

@@ -14,10 +14,10 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	return r;
 }
 
-double *rk4_single(double *(drdt)(double, double *, double *, uint), \
+void rk4_single(double (*drdt)(double, double *, double *, uint), \
 	double t, double r[], double drdt_args[], double dt, uint N_r) {
-	(void) drdt; (void) t; (void) r[]; (void) drdt_args[]; (void) dt; (void) N_r;
-	return 0.0;
+	(void) drdt; (void) t; (void) r; (void) drdt_args; (void) dt; (void) N_r;
+	return;
 }
 
 // currently only single var!!
@@ -27,14 +27,15 @@ double *euler_single(double (*drdt)(double, double *, double *, uint), \
 	return r; 
 }
 
-double *midpoint_single(double *(drdt)(double, double *, double *, uint), \
+double *midpoint_single(double (*drdt)(double, double *, double *, uint), \
 	double t, double r[], double drdt_args[], double dt, uint N_r) {
-	//estimate midpoint solution using 1/2*dt in euler_single.
-	double dt_mp = 0.5*dt;
+	double dt_mp = 0.5 * dt;
 	double *r_mp = euler_single( \
-		drdt, t, r, drdt_args[], dt_mp, uint N_r);
+		drdt, t, r, drdt_args, dt_mp, N_r);
 	//estimate soln using midpoint slope where midpoint r_mid.
-	*(r+1) = *r + drdt(t_mp, r_mp, drdt)
+
+	*(r+1) = *r + drdt(t + dt_mp, r_mp, drdt_args, N_r) * dt_mp;
+	return r;
 }
 
 int to_bin(double *data, uint N, uint dims, char fname[], char mode[]) {
