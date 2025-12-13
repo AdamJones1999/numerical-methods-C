@@ -18,20 +18,20 @@ BIN_DIR = $(BUILD_DIR)/bin
 LIB_DIR = $(BUILD_DIR)/lib
 DATA_DIR = ./data
 
-TARGET = $(BIN_DIR)/euler_test
+TARGET = $(BIN_DIR)/nummethods-test
 
 all: make-dir $(TARGET)
 make-dir:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR) $(DATA_DIR)
 
-OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/euler_test.o
+OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o
 
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS)
 
-$(OBJ_DIR)/euler_test.o: $(SRC_DIR)/euler_test.c $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/euler_test.c \
--o $(OBJ_DIR)/euler_test.o $(INCLUDE_DIRS)
+$(OBJ_DIR)/nummethods-test.o: $(SRC_DIR)/nummethods-test.c $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods-test.c \
+-o $(OBJ_DIR)/nummethods-test.o $(INCLUDE_DIRS)
 
 $(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods.c \
