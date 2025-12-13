@@ -82,8 +82,8 @@ int euler_basic_ODE() {
 	euler_method(simpleODE1, t, r, NULL, dt, N_t, N_rvars);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
 
-	if (write_to_bin(t, N_t, NDIMS, fn) == 0 && \
-		write_to_bin(r, N_rvars * N_t, NDIMS, fn) == 0) {
+	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
+		to_bin(r, N_rvars * N_t, NDIMS, fn, "a") == 0) {
 		free(t);
 		free(r);
 		return 0;
@@ -98,7 +98,7 @@ int euler_shm() {
 	// //////// test 2: simple harmonic motion (smhODE) ////////  
 	char *fn = "data/test2.data";
 	uint NDIMS = 1;
-	uint N_t = 1000;
+	uint N_t = 10000;
 	uint N_yvars = 1;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
@@ -126,7 +126,8 @@ int euler_shm() {
 	}
 
 	// write output to file
-	if (write_to_bin(t, N_t, NDIMS, fn) == 0 && write_to_bin(y, N_t, NDIMS, fn) == 0) {
+	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
+		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
 		free(t);
 		free(y);
 		free(dydt);

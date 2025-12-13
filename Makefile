@@ -39,6 +39,6 @@ $(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 
 .PHONY: clean clean_data
 clean:
-	rm -r $(BUILD_DIR) $(DATA)
+	rm -r $(BUILD_DIR) $(DATA_DIR)
 #clean_data:
 #	rm -r $(DATA_DIR)

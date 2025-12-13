@@ -22,9 +22,9 @@ double *euler_single(double (*drdt)(double, double *, double *, uint), \
 	return r; 
 }
 
-int write_to_bin(double *data, uint N, uint dims, char fname[]) {
+int to_bin(double *data, uint N, uint dims, char fname[], char mode[]) {
 	FILE *fp;
-	if ((fp = fopen(fname, "a")) == NULL) {
+	if ((fp = fopen(fname, mode)) == NULL) {
 		printf("cannot open file: %s", fname);
 		return -1;
 	}
@@ -38,7 +38,7 @@ int write_to_bin(double *data, uint N, uint dims, char fname[]) {
 			printf("support for writing 2D data is coming soon.\n");
 		}
 		else {
-			printf("writing %d dimension data to a .csv not supported.\n", dims);
+			printf("writing %d dimension data to binary not supported.\n", dims);
 		}
 		fclose(fp);
 		return -1;
