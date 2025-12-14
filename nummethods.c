@@ -34,7 +34,7 @@ double *midpoint_single(double (*drdt)(double, double *, double *, uint), \
 		drdt, t, r, drdt_args, dt_mp, N_r);
 	//estimate soln using midpoint slope where midpoint r_mid.
 
-	*(r+1) = *r + drdt(t + dt_mp, r_mp, drdt_args, N_r) * dt_mp;
+	*(r+1) = *r + drdt(t + dt_mp, r_mp, drdt_args, N_r) * dt;
 	return r;
 }
 
