@@ -67,17 +67,18 @@ int euler_basic_ODE() {
 	uint N_t = 5;
 	uint N_rvars = 1; // num dependent variables
 	uint NDIMS = 1;
-	double dt = 1; // timestep
-	// array decl
 	double *t = (double *) malloc(N_t * sizeof(double)); // indep var
-	double *r = (double *) malloc(N_t * N_rvars * sizeof(double)); // dep vars
-	// dep+indep vars output array
-	// double *tr = (double *) malloc(N_t * (1 + N_rvars) * sizeof(double));
-	uint i;
 	t[0] = 0;
+	uint i;
+	double dt = 1; // timestep
 	for (i=1; i<N_t; i++) { // init indep var array
 		t[i] = t[i-1]+dt;
 	}
+	// array decl
+	
+	double *r = (double *) malloc(N_t * N_rvars * sizeof(double)); // dep vars
+	// dep+indep vars output array
+	// double *tr = (double *) malloc(N_t * (1 + N_rvars) * sizeof(double));	
 	r[0] = 1; // initial dep var value for ivp
 	euler_method(simpleODE1, t, r, NULL, dt, N_t, N_rvars);
 	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
@@ -94,29 +95,29 @@ int euler_basic_ODE() {
 	}
 }
 
+// //////// test 2: simple harmonic motion (smhODE) ////////  
 int euler_shm() {
-	// //////// test 2: simple harmonic motion (smhODE) ////////  
 	char *fn = "data/test2.data";
+	// initialize vars
 	uint NDIMS = 1;
-	uint N_t = 10000;
 	uint N_yvars = 1;
+	uint N_t = 10000;
 	double *t = (double *) malloc(N_t * sizeof(double));
+	t[0] = 0;
+	double dt = 0.001;
+	uint i;
+	for (i=1; i<N_t; i++) { // init indep var array
+		t[i] = t[i-1]+dt;
+	}
+	
 	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
 	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
 	double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
 	double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
-	// double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
 	// initial conditions
 	y[0] = 1;
 	dydt[0] = 1;
-	//dydt_curr_next[1] = 0;
-	double dt = 0.001;
-	t[0] = 0;
-	uint i;
-	for (i=1; i<N_t; i++) { // init indep var array
-		t[i] = t[i-1]+dt;
-	}
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
 		dydt_args[0] = dydt[i];
@@ -131,6 +132,7 @@ int euler_shm() {
 		free(t);
 		free(y);
 		free(dydt);
+		free(dydt_args);
 		free(dydt2_args);
 		return 0;
 	}
@@ -139,6 +141,52 @@ int euler_shm() {
 		return -1;
 	}
 }
+
+// //////// test 3: simple harmonic motion (smhODE) ////////  
+int midpoint_shm() {
+	char *fn = "data/test3.data";
+	uint NDIMS = 1;
+	uint N_t = 10000;
+	double dt = 0.001;
+	uint N_yvars = 1;
+	double *t = (double *) malloc(N_t * sizeof(double));
+	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
+	// TODO: to save memory, only keep current and next dydt vals.
+	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
+	double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
+	double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
+	// initial conditions
+	y[0] = 1;
+	dydt[0] = 1;
+	t[0] = 0;
+	uint i;
+	for (i=1; i<N_t; i++) { // init indep var array
+		t[i] = t[i-1]+dt;
+	}
+	// numerical solving loop
+	for (i=0; i<N_t-1; i++) {
+		dydt_args[0] = dydt[i];
+		midpoint_single(shoODE_dydt, t[i], &y[i], dydt_args, dt, N_yvars);
+		dydt2_args[0] = y[i];
+		midpoint_single(shoODE_dydt2, t[i], &dydt[i], dydt2_args, dt, N_yvars); // calc dydt[i+1]
+	}
+
+	// write output to file
+	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
+		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
+		free(t);
+		free(y);
+		free(dydt);
+		free(dydt_args);
+		free(dydt2_args);
+		return 0;
+	}
+	else { 
+		printf("writing to %s failed\n", fn);
+		return -1;
+	}
+}
+
 
 void run_test(int (*test)(), char *test_name) {
 	if (test() == -1) {
@@ -151,15 +199,11 @@ void run_test(int (*test)(), char *test_name) {
 }
 
 int main() {
-	// //////////////// testing euler_method() ////////////////
-
-	// //////// test 1: simpleODE1 ////////  
-	// var decl and init
-
 	// //////////////// START TESING ////////////////
 	
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
-	run_test(euler_shm, "simple harmonic motion: y'' + 16y = 0");
+	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
+	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
 
 	// //////////////// END TESING ////////////////
 	return 0;
