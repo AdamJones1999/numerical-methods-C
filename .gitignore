@@ -1,3 +1,4 @@
 build/*
 data/*
 todo.txt
+pyrightconfig.json
