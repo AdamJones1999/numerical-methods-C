@@ -13,10 +13,6 @@ def shmODEsys(t, rcol, Nr):
 		dydt = np.zeros((2), dtype=float) # derivatives column
 		dydt[0] = rcol[1] # y' = v
 		dydt[1]= -16 * rcol[0] # v' = -16y
-		print(f"rcol: {rcol}")
-		print(f"rcol shape: {rcol.shape}")
-		print(f"dydt: {dydt}")
-		print(f"dydt shape: {dydt.shape}")
 		return dydt
 
 def shmODEEulerTest():

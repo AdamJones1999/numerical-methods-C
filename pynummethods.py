@@ -1,8 +1,6 @@
 import numpy as np
 
 def euler_single(drdt, t, r, i, dt, Nr):
-	print(f"r[:,{i}]: {r[:,i]}")
-	print(f"r[:,{i}] shape: {r[:,i].shape}")
 	r[:, i+1] = r[:, i] + drdt(t, r[:, i], Nr) * dt
 	return
 
