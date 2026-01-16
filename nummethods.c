@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <nummethods.h>
 
+// depreciated. still uses drdt_args[]
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r) {
 	uint i;
@@ -14,27 +15,33 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	return r;
 }
 
-void rk4_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r) {
-	(void) drdt; (void) t; (void) r; (void) drdt_args; (void) dt; (void) N_r;
+void rk4_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r) {
+	(void) drdt; (void) t; (void) r; (void) dt; (void) N_r;
 	return;
 }
 
 // currently only single var!!
-double *euler_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r) {
-	*(r+1) = *r + drdt(t, r, drdt_args, N_r) * dt;
+double *euler_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r) {
+	*(r+1) = *r + drdt(t, r, N_r) * dt;
 	return r; 
 }
 
-double *midpoint_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r) {
+// ERROR: euler_single returns pointer at same address passed to func.
+// then r+1 is modified. Then the 2nd slope calc uses r_mp which is 
+// STILL pointing to r passed into midpoint_single, meaning a single euler 
+// method iteration is done. No midpoint happens.
+double *midpoint_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r) {
 	double dt_mp = 0.5 * dt;
+	// ERROR: euler_single returns pointer at same address passed to func.
+	// then r+1 is modified. Then
 	double *r_mp = euler_single( \
-		drdt, t, r, drdt_args, dt_mp, N_r);
-	//estimate soln using midpoint slope where midpoint r_mid.
-
-	*(r+1) = *r + drdt(t + dt_mp, r_mp, drdt_args, N_r) * dt;
+		drdt, t, r, dt_mp, N_r);
+	//estimate soln using midpoint slope where midpoint r_mp is r(t+dt/2) estimated using euler.
+	// WRONG: OVERWRITES THE MIDPOINT
+	*(r+1) = *r + drdt(t + dt_mp, r_mp, N_r) * dt;
 	return r;
 }
 

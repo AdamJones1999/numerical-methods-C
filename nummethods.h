@@ -3,6 +3,7 @@ function declarations for numerical methods library
 */
 
 /*
+************* depreciated: still uses drdt_args[] *************
 @description:
 	this function implements the euler method for solving a 1st order ODE
 	ODE of this form:
@@ -47,16 +48,16 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 @return:
 	r: pointer to array containing solution.
 */
-double *euler_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r);
+double *euler_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r);
 
 //currently only single var
-void rk4_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r);
+void rk4_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r);
 
 //currently only single var tested
-double *midpoint_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r);
+double *midpoint_single(double (*drdt)(double, double *, uint), \
+	double t, double r[], double dt, uint N_r);
 
 
 /*
