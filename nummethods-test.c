@@ -31,32 +31,33 @@ double simpleODE1(double t, double r[], double dydt_args[], uint N_rvars) {
 }
 
 // simple harmonic motion y`` + 16y = 0 slope calc for y'
-double shoODE_dydt(double t, double y[], double dydt_args[], uint N_rvars) {
+double shoODE_dydt(double t, double y[], uint N_rvars) {
 	(void) t;
 	(void) y;
-	(void) dydt_args;
 	double dydt ; // 1st deriv of y
+	dydt = 2;
 	if (N_rvars != 1) {
 		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
 		exit(1);
 	}
 	else {
-		dydt = dydt_args[0];
+		// dydt = dydt_args[0];
 		return dydt;
 	}
 }
 
 // simple harmonic motion y`` + 16y = 0 slope calc for y''
-double shoODE_dydt2(double t, double dydt[], double dydt2_args[], uint N_rvars) {
+double shoODE_dydt2(double t, double dydt[], uint N_rvars) {
 	(void) t;
 	(void) dydt;
 	double dydt2; // 2nd deriv of y
+	dydt2 = 34;
 	if (N_rvars != 1) {
 		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
 		exit(1);
 	}
 	else {
-		dydt2 = -16*dydt2_args[0];
+		// dydt2 = -16*dydt2_args[0];
 		return dydt2;
 	}
 }
@@ -95,16 +96,16 @@ int euler_basic_ODE() {
 	}
 }
 
-// //////// test 2: simple harmonic motion (smhODE) ////////  
+// //////// test 2: simple harmonic motion using Euler Method (smhODE) ////////  
 int euler_shm() {
 	char *fn = "data/test2.data";
 	// initialize vars
 	uint NDIMS = 1;
 	uint N_yvars = 1;
-	uint N_t = 10000;
+	uint N_t = 1000;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	t[0] = 0;
-	double dt = 0.001;
+	double dt = 0.01;
 	uint i;
 	for (i=1; i<N_t; i++) { // init indep var array
 		t[i] = t[i-1]+dt;
@@ -113,17 +114,17 @@ int euler_shm() {
 	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
 	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
-	double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
-	double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
+	// double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
+	// double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
 	// initial conditions
 	y[0] = 1;
 	dydt[0] = 1;
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
-		dydt_args[0] = dydt[i];
-		euler_single(shoODE_dydt, t[i], &y[i], dydt_args, dt, N_yvars);
-		dydt2_args[0] = y[i];
-		euler_single(shoODE_dydt2, t[i], &dydt[i], dydt2_args, dt, N_yvars); // calc dydt[i+1]
+		// git sdydt_args[0] = dydt[i];
+		euler_single(shoODE_dydt, t[i], &y[i], dt, N_yvars);
+		// dydt2_args[0] = y[i];
+		euler_single(shoODE_dydt2, t[i], &dydt[i], dt, N_yvars); // calc dydt[i+1]
 	}
 
 	// write output to file
@@ -132,8 +133,8 @@ int euler_shm() {
 		free(t);
 		free(y);
 		free(dydt);
-		free(dydt_args);
-		free(dydt2_args);
+		//free(dydt_args);
+		//free(dydt2_args);
 		return 0;
 	}
 	else { 
@@ -142,19 +143,19 @@ int euler_shm() {
 	}
 }
 
-// //////// test 3: simple harmonic motion (smhODE) ////////  
+// //////// test 3: simple harmonic motion using Euler Method (smhODE) ////////  
 int midpoint_shm() {
 	char *fn = "data/test3.data";
 	uint NDIMS = 1;
-	uint N_t = 10000;
-	double dt = 0.001;
+	uint N_t = 1000;
+	double dt = 0.01;
 	uint N_yvars = 1;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
 	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
-	double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
-	double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
+	//double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
+	//double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
 	// initial conditions
 	y[0] = 1;
 	dydt[0] = 1;
@@ -165,10 +166,10 @@ int midpoint_shm() {
 	}
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
-		dydt_args[0] = dydt[i];
-		midpoint_single(shoODE_dydt, t[i], &y[i], dydt_args, dt, N_yvars);
-		dydt2_args[0] = y[i];
-		midpoint_single(shoODE_dydt2, t[i], &dydt[i], dydt2_args, dt, N_yvars); // calc dydt[i+1]
+		//dydt_args[0] = dydt[i];
+		midpoint_single(shoODE_dydt, t[i], &y[i], dt, N_yvars);
+		//dydt2_args[0] = y[i];
+		midpoint_single(shoODE_dydt2, t[i], &dydt[i], dt, N_yvars); // calc dydt[i+1]
 	}
 
 	// write output to file
@@ -177,8 +178,8 @@ int midpoint_shm() {
 		free(t);
 		free(y);
 		free(dydt);
-		free(dydt_args);
-		free(dydt2_args);
+		//free(dydt_args);
+		//free(dydt2_args);
 		return 0;
 	}
 	else { 
