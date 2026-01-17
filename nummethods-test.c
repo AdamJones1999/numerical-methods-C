@@ -15,9 +15,9 @@ to arrays as arguments.
 @return:
 	k: calculated dr/dt.
 */
-double simpleODE1(double t, double r[], double dydt_args[], uint N_rvars) {
+double simpleODE1(double t, double r[], double drdt_args[], uint N_rvars) {
 	(void) t;
-	(void) dydt_args;
+	(void) drdt_args;
 	double k; // dr/dt
 	(void)t; // cast to void to suppresses unused param warning
 	if (N_rvars != 1) {
@@ -101,7 +101,7 @@ int euler_shm() {
 	char *fn = "data/test2.data";
 	// initialize vars
 	uint NDIMS = 1;
-	uint N_yvars = 1;
+	uint N_rvars = 2;
 	uint N_t = 1000;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	t[0] = 0;
@@ -111,30 +111,30 @@ int euler_shm() {
 		t[i] = t[i-1]+dt;
 	}
 	
-	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
+	double *r = (double *) malloc(N_rvars * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
-	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
-	// double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
-	// double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
+	double *drdt = (double *) malloc(N_rvars * N_t * sizeof(double));
+	// double *drdt_args = (double *) malloc(N_rvars * sizeof(double));
+	// double *drdt2_args = (double *) malloc(N_rvars * sizeof(double));
 	// initial conditions
-	y[0] = 1;
-	dydt[0] = 1;
+	r[0] = 1;
+	drdt[0] = 1;
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
-		// git sdydt_args[0] = dydt[i];
-		euler_single(shoODE_dydt, t[i], &y[i], dt, N_yvars);
-		// dydt2_args[0] = y[i];
-		euler_single(shoODE_dydt2, t[i], &dydt[i], dt, N_yvars); // calc dydt[i+1]
+		// drdt_args[0] = drdt[i];
+		euler_single(shoODE_dydt, t[i], &r[i], dt, N_rvars);
+		// drdt2_args[0] = r[i];
+		euler_single(shoODE_dydt2, t[i], &drdt[i], dt, N_rvars); // calc drdt[i+1]
 	}
 
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
-		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
+		to_bin(r, N_t, NDIMS, fn, "a") == 0) {
 		free(t);
-		free(y);
-		free(dydt);
-		//free(dydt_args);
-		//free(dydt2_args);
+		free(r);
+		free(drdt);
+		//free(drdt_args);
+		//free(drdt2_args);
 		return 0;
 	}
 	else { 
@@ -149,16 +149,16 @@ int midpoint_shm() {
 	uint NDIMS = 1;
 	uint N_t = 1000;
 	double dt = 0.01;
-	uint N_yvars = 1;
+	uint N_rvars = 1;
 	double *t = (double *) malloc(N_t * sizeof(double));
-	double *y = (double *) malloc(N_yvars * N_t * sizeof(double));
-	// TODO: to save memory, only keep current and next dydt vals.
-	double *dydt = (double *) malloc(N_yvars * N_t * sizeof(double));
-	//double *dydt_args = (double *) malloc(N_yvars * sizeof(double));
-	//double *dydt2_args = (double *) malloc(N_yvars * sizeof(double));
+	double *r = (double *) malloc(N_rvars * N_t * sizeof(double));
+	// TODO: to save memory, only keep current and next drdt vals.
+	double *drdt = (double *) malloc(N_rvars * N_t * sizeof(double));
+	//double *drdt_args = (double *) malloc(N_rvars * sizeof(double));
+	//double *drdt2_args = (double *) malloc(N_rvars * sizeof(double));
 	// initial conditions
-	y[0] = 1;
-	dydt[0] = 1;
+	r[0] = 1;
+	drdt[0] = 1;
 	t[0] = 0;
 	uint i;
 	for (i=1; i<N_t; i++) { // init indep var array
@@ -166,20 +166,20 @@ int midpoint_shm() {
 	}
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
-		//dydt_args[0] = dydt[i];
-		midpoint_single(shoODE_dydt, t[i], &y[i], dt, N_yvars);
-		//dydt2_args[0] = y[i];
-		midpoint_single(shoODE_dydt2, t[i], &dydt[i], dt, N_yvars); // calc dydt[i+1]
+		//drdt_args[0] = drdt[i];
+		midpoint_single(shoODE_dydt, t[i], &r[i], dt, N_rvars);
+		//drdt2_args[0] = r[i];
+		midpoint_single(shoODE_dydt2, t[i], &drdt[i], dt, N_rvars); // calc drdt[i+1]
 	}
 
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
-		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
+		to_bin(r, N_t, NDIMS, fn, "a") == 0) {
 		free(t);
-		free(y);
-		free(dydt);
-		//free(dydt_args);
-		//free(dydt2_args);
+		free(r);
+		free(drdt);
+		//free(drdt_args);
+		//free(drdt2_args);
 		return 0;
 	}
 	else { 
