@@ -3,6 +3,20 @@
 #include <ctype.h>
 #include <nummethods.h>
 
+double **malloc_2d_array_double(uint row, uint col) {
+	double **rows = (double **) malloc(row * sizeof(double));
+	uint i=0;
+	for (i; i<col; i++) {
+		rows[i] = (double *) malloc(col * sizeof(double));
+	}
+	return rows;
+}
+
+void free_2d_array(void *p_arr) {
+	(void) p_arr;
+	return;
+}
+
 // depreciated. still uses drdt_args[]
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r) {
