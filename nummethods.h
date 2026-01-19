@@ -5,6 +5,25 @@ function declarations for numerical methods library
 /*
 ************* depreciated: still uses drdt_args[] *************
 @description:
+	this function allocates memory for a 2D array in non-contiguous blocks. There are 'row' number of blocks, each representing a row. Each row is of length 'col'. Columns are made of 1 element from each row. For example: column i is made of the ith element in row 0, the ith element in row 1, and so on.  
+
+
+@params:
+	row: number of rows in array.
+	col: number of columns in array
+@precond:
+	system is not out of memory to allocate rows to.
+	
+@return: 
+	rows: pointer to start of first row of array.
+*/
+double **malloc_2d_array_double(uint row, uint col);
+
+void free_2d_array(void *p_arr);
+
+/*
+************* depreciated: still uses drdt_args[] *************
+@description:
 	this function implements the euler method for solving a 1st order ODE
 	ODE of this form:
 		d(x(t))/dt = f(x(t), t)
