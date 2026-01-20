@@ -6,8 +6,8 @@
 int malloc_2d_array_double_tests() {
 	int pass = 0;
 	double el;
-	uint nrow = 2;
-	uint ncol = 4;
+	uint nrow = 4;
+	uint ncol = 2;
 	double **a = malloc_2d_array_double(nrow, ncol);
 	uint i;
 	uint j;
@@ -21,9 +21,8 @@ int malloc_2d_array_double_tests() {
 		}
 	}
 	return pass;
-}
+} 
 
-int 
 
 /*
 @description: 

@@ -19,7 +19,7 @@ function declarations for numerical methods library
 */
 double **malloc_2d_array_double(uint row, uint col);
 
-void free_2d_array(void *p_arr);
+void free_2d_array_double(double **arr, uint nrow);
 
 /*
 ************* depreciated: still uses drdt_args[] *************
