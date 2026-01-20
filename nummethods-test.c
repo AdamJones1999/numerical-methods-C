@@ -19,9 +19,9 @@ double simpleODE1(double t, double r[], double drdt_args[], uint N_rvars) {
 	(void) t;
 	(void) drdt_args;
 	double k; // dr/dt
-	(void)t; // cast to void to suppresses unused param warning
-	if (N_rvars != 1) {
-		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
+	(void) t; // cast to void to suppresses unused param warning
+	if (N_rvars != 2) {
+		fprintf(stderr, "simpleODE1 error: Given %d dependent var values, should be 2.\n", N_rvars);
 		exit(1);
 	}
 	else {
@@ -62,6 +62,26 @@ double shoODE_dydt2(double t, double dydt[], uint N_rvars) {
 	}
 }
 
+int malloc_2d_array_double_tests() {
+	int pass = 0;
+	double el;
+	uint nrow = 2;
+	uint ncol = 4;
+	double **a = malloc_2d_array_double(nrow, ncol);
+	uint i;
+	uint j;
+	for (i=0; i<nrow; i++) {
+		for (j=0; j<ncol; j++) {
+			el = (double) 2*i+j;
+			a[i][j] = el;
+			if (a[i][j] != el) {
+				pass = -1;
+			}
+		}
+	}
+	return pass;
+}
+
 // //////// test 1: simpleODE1 ////////  
 int euler_basic_ODE() {
 	char *fn = "data/test1.data";
@@ -96,7 +116,7 @@ int euler_basic_ODE() {
 	}
 }
 
-// //////// test 2: simple harmonic motion using Euler Method (smhODE) ////////  
+// //////// test: simple harmonic motion using Euler Method (smhODE) ////////  
 int euler_shm() {
 	char *fn = "data/test2.data";
 	// initialize vars
@@ -143,13 +163,13 @@ int euler_shm() {
 	}
 }
 
-// //////// test 3: simple harmonic motion using Euler Method (smhODE) ////////  
+// //////// test: simple harmonic motion using Midpoint Method (smhODE) ////////  
 int midpoint_shm() {
 	char *fn = "data/test3.data";
 	uint NDIMS = 1;
 	uint N_t = 1000;
 	double dt = 0.01;
-	uint N_rvars = 1;
+	uint N_rvars = 2;
 	double *t = (double *) malloc(N_t * sizeof(double));
 	double *r = (double *) malloc(N_rvars * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next drdt vals.
@@ -190,11 +210,17 @@ int midpoint_shm() {
 
 
 void run_test(int (*test)(), char *test_name) {
-	if (test() == -1) {
+	printf("starting test: %s.\n", test_name);
+	int result = test();
+	if (result == -1) {
 		printf("test: %s failed\n", test_name);
 	}
-	else {
+	else if (result == 0) {
 		printf("test: %s passed\n", test_name);
+	}
+	else {
+		printf("test: %s returned undefined return code of %d \
+			(not 0 or -1)", test_name, result);
 	}
 	return;
 }
@@ -205,7 +231,7 @@ int main() {
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
-
+	run_test(malloc_2d_array_double_tests, "testing writing then reading from 2d allocated array");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
