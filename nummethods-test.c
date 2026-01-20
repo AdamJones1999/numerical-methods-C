@@ -2,6 +2,29 @@
 #include <stdio.h>
 #include <nummethods.h>
 
+
+int malloc_2d_array_double_tests() {
+	int pass = 0;
+	double el;
+	uint nrow = 2;
+	uint ncol = 4;
+	double **a = malloc_2d_array_double(nrow, ncol);
+	uint i;
+	uint j;
+	for (i=0; i<nrow; i++) {
+		for (j=0; j<ncol; j++) {
+			el = (double) 2*i+j;
+			a[i][j] = el;
+			if (a[i][j] != el) {
+				pass = -1;
+			}
+		}
+	}
+	return pass;
+}
+
+int 
+
 /*
 @description: 
 	simple dy/dt calculator for ODE y = y' for certain value t and r(t). 
@@ -62,31 +85,11 @@ double shoODE_dydt2(double t, double dydt[], uint N_rvars) {
 	}
 }
 
-int malloc_2d_array_double_tests() {
-	int pass = 0;
-	double el;
-	uint nrow = 2;
-	uint ncol = 4;
-	double **a = malloc_2d_array_double(nrow, ncol);
-	uint i;
-	uint j;
-	for (i=0; i<nrow; i++) {
-		for (j=0; j<ncol; j++) {
-			el = (double) 2*i+j;
-			a[i][j] = el;
-			if (a[i][j] != el) {
-				pass = -1;
-			}
-		}
-	}
-	return pass;
-}
-
 // //////// test 1: simpleODE1 ////////  
 int euler_basic_ODE() {
 	char *fn = "data/test1.data";
 	uint N_t = 5;
-	uint N_rvars = 1; // num dependent variables
+	uint N_rvars = 2; // num dependent variables
 	uint NDIMS = 1;
 	double *t = (double *) malloc(N_t * sizeof(double)); // indep var
 	t[0] = 0;
@@ -228,10 +231,11 @@ void run_test(int (*test)(), char *test_name) {
 int main() {
 	// //////////////// START TESING ////////////////
 	
+	run_test(malloc_2d_array_double_tests, "testing writing then reading from 2d allocated array");
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
-	run_test(malloc_2d_array_double_tests, "testing writing then reading from 2d allocated array");
+	
 	// //////////////// END TESING ////////////////
 	return 0;
 }
