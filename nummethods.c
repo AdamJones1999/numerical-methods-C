@@ -3,17 +3,20 @@
 #include <ctype.h>
 #include <nummethods.h>
 
-double **malloc_2d_array_double(uint row, uint col) {
-	double **rows = (double **) malloc(row * sizeof(double));
-	uint i=0;
-	for (i; i<col; i++) {
-		rows[i] = (double *) malloc(col * sizeof(double));
+double **malloc_2d_array_double(uint nrow, uint ncol) {
+	double **rows = (double **) malloc(nrow * sizeof(double));
+	uint i;
+	for (i=0; i<nrow; i++) {
+		rows[i] = (double *) malloc(ncol * sizeof(double));
 	}
 	return rows;
 }
 
-void free_2d_array(void *p_arr) {
-	(void) p_arr;
+void free_2d_array_double(double **arr, uint nrow) {
+	uint i;
+	for (i=0; i<nrow; i++) {
+		free(arr[i]);
+	}
 	return;
 }
 
