@@ -1,14 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <nummethods.h>
 
 
-int malloc_2d_array_double_tests() {
+int malloc_2d_array_tests() {
 	int pass = 0;
 	double el;
-	uint nrow = 4;
+	uint nrow = 5;
 	uint ncol = 2;
-	double **a = malloc_2d_array_double(nrow, ncol);
+	double **a = alloc_2d_array(nrow, ncol);
 	uint i;
 	uint j;
 	for (i=0; i<nrow; i++) {
@@ -20,10 +21,15 @@ int malloc_2d_array_double_tests() {
 			}
 		}
 	}
+	print_2d_array(a, nrow, ncol); // 
+	free_2d_array((void **) a);
+
 	return pass;
 } 
 
-
+int free_2d_array_tests() {
+	return 0;
+}
 /*
 @description: 
 	simple dy/dt calculator for ODE y = y' for certain value t and r(t). 
@@ -57,9 +63,9 @@ double shoODE_dydt(double t, double y[], uint N_rvars) {
 	(void) t;
 	(void) y;
 	double dydt ; // 1st deriv of y
-	dydt = 2;
-	if (N_rvars != 1) {
-		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
+	dydt = 2; // placeholder
+	if (N_rvars != 2) {
+		fprintf(stderr, "ERROR: Given %d dependent var values, should be 2.\n", N_rvars);
 		exit(1);
 	}
 	else {
@@ -74,8 +80,8 @@ double shoODE_dydt2(double t, double dydt[], uint N_rvars) {
 	(void) dydt;
 	double dydt2; // 2nd deriv of y
 	dydt2 = 34;
-	if (N_rvars != 1) {
-		fprintf(stderr, "ERROR: Given %d dependent var values, should be 1.", N_rvars);
+	if (N_rvars != 2) {
+		fprintf(stderr, "ERROR: Given %d dependent var values, should be 2.", N_rvars);
 		exit(1);
 	}
 	else {
@@ -104,7 +110,7 @@ int euler_basic_ODE() {
 	// double *tr = (double *) malloc(N_t * (1 + N_rvars) * sizeof(double));	
 	r[0] = 1; // initial dep var value for ivp
 	euler_method(simpleODE1, t, r, NULL, dt, N_t, N_rvars);
-	printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
+	//printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
 
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
 		to_bin(r, N_rvars * N_t, NDIMS, fn, "a") == 0) {
@@ -230,7 +236,8 @@ void run_test(int (*test)(), char *test_name) {
 int main() {
 	// //////////////// START TESING ////////////////
 	
-	run_test(malloc_2d_array_double_tests, "testing writing then reading from 2d allocated array");
+	run_test(malloc_2d_array_tests, "writing then reading from 2d array with row ptrs");
+	
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
