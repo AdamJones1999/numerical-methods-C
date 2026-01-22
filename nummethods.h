@@ -4,7 +4,7 @@ function declarations for numerical methods library
 
 /*
 @description:
-	this function allocates a 2D array as one block of memory for the array data, then another block of memory to store the pointers to each row in the main block of memory. This function handles assigning the pointers in the pointer block to the correct addresses in the main block of memory.  
+	this function allocates a 2D array of doubles (TODO: test if type agnostic works) as one block of memory for the array data, then another block of memory to store the pointers to each row in the main block of memory. This function handles assigning the pointers in the pointer block to the correct addresses in the main block of memory.  
 
 @params:
 	row: number of rows in array.
@@ -15,11 +15,11 @@ function declarations for numerical methods library
 @return: 
 	rows: pointer to start of first of array.
 */
-double **alloc_2d_array_with_row_ptrs(uint row, uint col);
+double **alloc_2d_array(uint nrow, uint ncol);
 
-//void free_2d_array(void **arr, uint nrow, uint ncol, size_t el_size);
+void free_2d_array(void **arr);
 
-//void print_2d_array_addrs_double(double *arr, uint nrow, uint ncol);
+void print_2d_array(double **arr, uint nrow, uint ncol);
 
 /*
 ************* depreciated: still uses drdt_args[] *************

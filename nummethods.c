@@ -5,7 +5,7 @@
 
 // allocates one block of memory for array data and then a 
 // vector of row pointers.
-double **alloc_2d_array_with_row_ptrs(uint nrow, uint ncol) {
+double **alloc_2d_array(uint nrow, uint ncol) {
 	double **rows = (double **) malloc(nrow * sizeof(double *));
 	uint i;
 	double *arr = (double *) malloc(nrow * ncol * sizeof(double));
@@ -15,6 +15,24 @@ double **alloc_2d_array_with_row_ptrs(uint nrow, uint ncol) {
 	return rows;
 }
 
+void free_2d_array(void **arr) {
+	free(arr[0]);
+	free(arr);
+	return;
+}
+
+void print_2d_array(double **arr, uint nrow, uint ncol) {
+	(void) ncol;
+	uint i;
+	uint j;
+	for (i=0; i<nrow; i++) {
+		for (j=0; j<ncol; j++)
+		printf("address of addr [%d][%d]: %p\n", i, j, (void *) &arr[i][j]);
+		//for (j=0; j<nrow; j++) {
+		//}
+	}
+	return;
+}
 
 // depreciated. still uses drdt_args[]
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
