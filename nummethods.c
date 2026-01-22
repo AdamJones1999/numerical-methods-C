@@ -3,22 +3,18 @@
 #include <ctype.h>
 #include <nummethods.h>
 
-double **malloc_2d_array_double(uint nrow, uint ncol) {
-	double **rows = (double **) malloc(nrow * sizeof(double));
+// allocates one block of memory for array data and then a 
+// vector of row pointers.
+double **alloc_2d_array_with_row_ptrs(uint nrow, uint ncol) {
+	double **rows = (double **) malloc(nrow * sizeof(double *));
 	uint i;
+	double *arr = (double *) malloc(nrow * ncol * sizeof(double));
 	for (i=0; i<nrow; i++) {
-		rows[i] = (double *) malloc(ncol * sizeof(double));
+		rows[i] = &arr[i * ncol];
 	}
 	return rows;
 }
 
-void free_2d_array_double(double **arr, uint nrow) {
-	uint i;
-	for (i=0; i<nrow; i++) {
-		free(arr[i]);
-	}
-	return;
-}
 
 // depreciated. still uses drdt_args[]
 double *euler_method(double (*drdt)(double, double *, double *, uint), \

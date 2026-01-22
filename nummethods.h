@@ -3,10 +3,8 @@ function declarations for numerical methods library
 */
 
 /*
-************* depreciated: still uses drdt_args[] *************
 @description:
-	this function allocates memory for a 2D array in non-contiguous blocks. There are 'row' number of blocks, each representing a row. Each row is of length 'col'. Columns are made of 1 element from each row. For example: column i is made of the ith element in row 0, the ith element in row 1, and so on.  
-
+	this function allocates a 2D array as one block of memory for the array data, then another block of memory to store the pointers to each row in the main block of memory. This function handles assigning the pointers in the pointer block to the correct addresses in the main block of memory.  
 
 @params:
 	row: number of rows in array.
@@ -15,11 +13,13 @@ function declarations for numerical methods library
 	system is not out of memory to allocate rows to.
 	
 @return: 
-	rows: pointer to start of first row of array.
+	rows: pointer to start of first of array.
 */
-double **malloc_2d_array_double(uint row, uint col);
+double **alloc_2d_array_with_row_ptrs(uint row, uint col);
 
-void free_2d_array_double(double **arr, uint nrow);
+//void free_2d_array(void **arr, uint nrow, uint ncol, size_t el_size);
+
+//void print_2d_array_addrs_double(double *arr, uint nrow, uint ncol);
 
 /*
 ************* depreciated: still uses drdt_args[] *************
