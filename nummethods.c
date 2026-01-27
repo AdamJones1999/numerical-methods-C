@@ -6,13 +6,13 @@
 // allocates one block of memory for array data and then a 
 // vector of row pointers.
 double **alloc_2d_array(uint nrow, uint ncol) {
-	double **rows = (double **) malloc(nrow * sizeof(double *));
+	double **row_ptrs = (double **) malloc(nrow * sizeof(double *));
+	double *data_block = (double *) malloc(nrow * ncol * sizeof(double));
 	uint i;
-	double *arr = (double *) malloc(nrow * ncol * sizeof(double));
 	for (i=0; i<nrow; i++) {
-		rows[i] = &arr[i * ncol];
+		row_ptrs[i] = &data_block[i * ncol];
 	}
-	return rows;
+	return row_ptrs;
 }
 
 void free_2d_array(void **arr) {
