@@ -14,7 +14,7 @@ int malloc_2d_array_tests() {
 	uint j;
 	for (i=0; i<nrow; i++) {
 		for (j=0; j<ncol; j++) {
-			el = (double) 2*i+j;
+			el = (double) (i+1)*(j+1);
 			a[i][j] = el;
 			if (a[i][j] != el) {
 				pass = -1;
@@ -22,8 +22,29 @@ int malloc_2d_array_tests() {
 		}
 	}
 	print_2d_array(a, nrow, ncol); // 
-	free_2d_array((void **) a);
+	
+	printf("size of pointer: %lu\n", sizeof(a));
+	printf("size of double: %lu\n", sizeof(double));
+	printf("address pointer to row pointers points to: %p\n", (void *) a);
+	printf("address the pointer that points to row pointer 0 is stored at: %p\n", (void *) &a);
+	printf("address row pointer 0 is stored at: %p\n", (void *) &a[0]);
+	printf("address row pointer 0 points to: %p\n", (void *) a[0]);		
+	printf("address row pointer 1 is stored at: %p\n", (void *) &a[1]);
+	printf("address row pointer 4 is stored at: %p\n", (void *) &a[4]);
+	printf("address of first element in contiguous block: %p\n", (void *) &a[0][0]);
+	printf("value of first element in contiguous block accessed by 2d index: %f\n", a[0][0]);
+	printf("value of first element in contiguous block accessed by dereference: %f\n", *a[0]);
 
+	free_2d_array((void  **) a);
+	printf("array freed\n");
+
+	// *a should be nil but still readable as 'a' is in stack memory
+	printf("Dereferencing ptr a after freeing: %p\n", (void*)*a);
+	printf("Dereferenced ptr a after freeing\n");
+	// *a[0] seg faults as it is a value in heap memory trying to be read
+	//printf("Dereferencing a[0]: %f\n", *a[0]);
+	//printf("Dereferenced ptr a[0] after freeing\n");
+	
 	return pass;
 } 
 
