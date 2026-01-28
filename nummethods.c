@@ -23,14 +23,23 @@ void free_2d_array(void **arr) {
 
 void print_2d_array(double **arr, uint nrow, uint ncol) {
 	(void) ncol;
+	printf("addr of first element of array: %p\n", (void *) arr[0]);
+	printf("addr of last element of array: %p\n", (void *) &arr[nrow-1][ncol-1]);
 	uint i;
 	uint j;
 	for (i=0; i<nrow; i++) {
 		for (j=0; j<ncol; j++)
-		printf("address of addr [%d][%d]: %p\n", i, j, (void *) &arr[i][j]);
+		printf("[%d][%d] value: %f\n", i, j, arr[i][j]);
 		//for (j=0; j<nrow; j++) {
 		//}
 	}
+	printf("address pointer to row pointers points to: %p\n", (void *) arr);
+	printf("address the pointer that points to row pointer 0 is stored at: %p\n", (void *) &arr);
+	printf("address row pointer 0 is stored at: %p\n", (void *) &arr[0]);
+	printf("address row pointer 0 points to: %p\n", (void *) arr[0]);		
+	printf("address of first element in contiguous block: %p\n", (void *) &arr[0][0]);
+	printf("value of first element in contiguous block accessed by 2d index: %f\n", arr[0][0]);
+	printf("value of first element in contiguous block accessed by dereference: %f\n", *arr[0]);
 	return;
 }
 
