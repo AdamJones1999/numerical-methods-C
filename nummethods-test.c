@@ -21,36 +21,33 @@ int malloc_2d_array_tests() {
 			}
 		}
 	}
-	print_2d_array(a, nrow, ncol); // 
-	
-	printf("size of pointer: %lu\n", sizeof(a));
-	printf("size of double: %lu\n", sizeof(double));
-	printf("address pointer to row pointers points to: %p\n", (void *) a);
-	printf("address the pointer that points to row pointer 0 is stored at: %p\n", (void *) &a);
-	printf("address row pointer 0 is stored at: %p\n", (void *) &a[0]);
-	printf("address row pointer 0 points to: %p\n", (void *) a[0]);		
-	printf("address row pointer 1 is stored at: %p\n", (void *) &a[1]);
-	printf("address row pointer 4 is stored at: %p\n", (void *) &a[4]);
-	printf("address of first element in contiguous block: %p\n", (void *) &a[0][0]);
-	printf("value of first element in contiguous block accessed by 2d index: %f\n", a[0][0]);
-	printf("value of first element in contiguous block accessed by dereference: %f\n", *a[0]);
-
 	free_2d_array((void  **) a);
-	printf("array freed\n");
-
-	// *a should be nil but still readable as 'a' is in stack memory
-	printf("Dereferencing ptr a after freeing: %p\n", (void*)*a);
-	printf("Dereferenced ptr a after freeing\n");
-	// *a[0] seg faults as it is a value in heap memory trying to be read
-	//printf("Dereferencing a[0]: %f\n", *a[0]);
-	//printf("Dereferenced ptr a[0] after freeing\n");
 	
 	return pass;
 } 
 
+/*
+not a real test. I don't know how to test whether accessing a data has been 
+actually freed or not without causing a segfault. There is a commented line in 
+this 'test' that will cause a segfault thus proving the memory has been freed
+*/
 int free_2d_array_tests() {
+	uint nrow = 5;
+	uint ncol = 2;
+	double **arr = alloc_2d_array(nrow, ncol);
+	print_2d_array(arr, nrow, ncol);
+	free_2d_array((void  **) arr);
+	printf("array should be freed if free_2d_array() is correct.\n");
+
+	// *a should be nil but still readable as 'a' is in stack memory
+	printf("Dereferencing ptr a after freeing: %p\n", (void*)*arr);
+	printf("Dereferenced ptr a after freeing\n");
+	// *a[0] seg faults as it is a value in heap memory trying to be read
+	//printf("Dereferencing a[0]: %f\n", *a[0]);
+	//printf("Dereferenced ptr a[0] after freeing\n");
 	return 0;
 }
+
 /*
 @description: 
 	simple dy/dt calculator for ODE y = y' for certain value t and r(t). 
@@ -239,13 +236,13 @@ int midpoint_shm() {
 
 
 void run_test(int (*test)(), char *test_name) {
-	printf("starting test: %s.\n", test_name);
+	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
 	if (result == -1) {
-		printf("test: %s failed\n", test_name);
+		printf("FAILED test: %s\n", test_name);
 	}
 	else if (result == 0) {
-		printf("test: %s passed\n", test_name);
+		printf("PASSED test: %s\n", test_name);
 	}
 	else {
 		printf("test: %s returned undefined return code of %d \
@@ -258,7 +255,7 @@ int main() {
 	// //////////////// START TESING ////////////////
 	
 	run_test(malloc_2d_array_tests, "writing then reading from 2d array with row ptrs");
-	
+	//run_test(free_2d_array_tests, "freeing array and (if uncommented) causing segfault to verify memory is freed");
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
