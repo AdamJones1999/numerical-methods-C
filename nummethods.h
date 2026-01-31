@@ -47,7 +47,7 @@ void print_2d_array(double **arr, uint nrow, uint ncol);
 	r: pointer to array containing solution.
 */
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
-	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r);
+	double t[], double r[], double drdt_args[], double dt, uint Nt, uint Nr);
 
 /* 
 @description: 
@@ -56,8 +56,7 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 @params:
 	drdt: func pointer to derivative function.
 	t: independent variable value.
-	r[]: array storing dependent variables.
-	drdt_args[]: array of arguments passed to drdt as 3rd argument.
+	r[]: array storing dependent variable data.
 	dt: different between t and next independent var value.
 	N_r: number of dependent variables in the ODE system.
 @precond:
@@ -67,16 +66,16 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 @return:
 	r: pointer to array containing solution.
 */
-double *euler_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r);
+double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr);
 
 //currently only single var
 void rk4_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r);
+	double t, double r[], double dt, uint Nr);
 
 //currently only single var tested
-double *midpoint_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r);
+double *midpoint_single(double (*drdt_f)(double, double *, uint), \
+	double t, double r[], double dt, uint Nr);
 
 
 /*
