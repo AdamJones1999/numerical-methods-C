@@ -45,26 +45,39 @@ void print_2d_array(double **arr, uint nrow, uint ncol) {
 
 // depreciated. still uses drdt_args[]
 double *euler_method(double (*drdt)(double, double *, double *, uint), \
-	double t[], double r[], double drdt_args[], double dt, uint N_t, uint N_r) {
+	double t[], double r[], double drdt_args[], double dt, uint Nt, uint Nr) {
 	uint i;
 	(void) drdt_args;
 	// compute solution values up to index N
-	for (i=0; i<N_t-1; i++) {
-		r[i+1] = r[i] + drdt(t[i], &r[i], &drdt_args[i], N_r) * dt;
+	for (i=0; i<Nt-1; i++) {
+		r[i+1] = r[i] + drdt(t[i], &r[i], &drdt_args[i], Nr) * dt;
 	} 
 	return r;
 }
 
 void rk4_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r) {
-	(void) drdt; (void) t; (void) r; (void) dt; (void) N_r;
+	double t, double r[], double dt, uint Nr) {
+	(void) drdt; (void) t; (void) r; (void) dt; (void) Nr;
 	return;
 }
 
 // currently only single var!!
-double *euler_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r) {
-	*(r+1) = *r + drdt(t, r, N_r) * dt;
+double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr) {
+	double *r_curr = (double *) malloc(Nr * sizeof(double));
+	double *drdt_curr = (double *) malloc(Nr * sizeof(double));
+	uint i;
+	// read r column into r_curr array
+	for (i = 0; i < Nr; i++) {
+		r_curr[i] = r[i][j_r];
+	}
+	// compute drdt for r colummn and t value using r_curr so drdt_f doesn't deal with indexing.
+	drdt_f(drdt_curr, r_curr, t, Nr);
+	// use each value in the drdt array in calculation of next solution step
+	for (i = 0; i < Nr; i++) {
+		r[i][j_r+1] = r[i][j_r] + drdt_curr[i] * dt;
+	}
+
 	return r; 
 }
 
@@ -72,16 +85,25 @@ double *euler_single(double (*drdt)(double, double *, uint), \
 // then r+1 is modified. Then the 2nd slope calc uses r_mp which is 
 // STILL pointing to r passed into midpoint_single, meaning a single euler 
 // method iteration is done. No midpoint happens.
-double *midpoint_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint N_r) {
+double *midpoint_single(double (*drdt_f)(double, double *, uint), \
+	double t, double r[], double dt, uint Nr) {
+	(void) drdt_f;
+	(void) t;
+	(void) r;
+	(void) dt;
+	(void) Nr;
+	// TODO: Reimplement to support multivar. Currently broken due to euler_single()
+	// and changes to how drdt() functions interface with num methods. 
+	/*
 	double dt_mp = 0.5 * dt;
 	// ERROR: euler_single returns pointer at same address passed to func.
 	// then r+1 is modified. Then
 	double *r_mp = euler_single( \
-		drdt, t, r, dt_mp, N_r);
+		drdt, t, r, dt_mp, Nr);
 	//estimate soln using midpoint slope where midpoint r_mp is r(t+dt/2) estimated using euler.
 	// WRONG: OVERWRITES THE MIDPOINT
-	*(r+1) = *r + drdt(t + dt_mp, r_mp, N_r) * dt;
+	*(r+1) = *r + drdt(t + dt_mp, r_mp, Nr) * dt;
+	*/
 	return r;
 }
 
