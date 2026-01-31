@@ -76,12 +76,21 @@ double simpleODE1(double t, double r[], double drdt_args[], uint Nr) {
 	}
 }
 
-double *shoODE(double t, double r[], double r_next[], uint Nr) {
-	if Nr
+void shoODE_drdt(double drdt_t[], double r_t[], double t, uint Nr) {
+	(void) t;
+	if (Nr != 2) {
+		fprintf(stderr, "ERROR: Given %d dependent var values, should be 2.\n", Nr);
+		exit(1);
+	}
+	drdt_t[0] = r_t[1];
+	drdt_t[1] = -16*r_t[0];
+	return;
 }
 
 // simple harmonic motion y`` + 16y = 0 slope calc for y'
-double shoODE_dydt(double t, double y[], uint Nr) {
+/* TODO: likely replaced by multivar shoODE_drdt()
+double shoODE_dydt(double drdt_t[], double y[], double t, uint Nr) {
+	(void) drdt_t;
 	(void) t;
 	(void) y;
 	double dydt; // 1st deriv of y
@@ -91,14 +100,14 @@ double shoODE_dydt(double t, double y[], uint Nr) {
 		exit(1);
 	}
 	else {
-		
 		// dydt = dydt_args[0];
 		return dydt;
 	}
 }
-
+*/
 // simple harmonic motion y`` + 16y = 0 slope calc for y''
-double shoODE_dydt2(double t, double dydt[], uint Nr) {
+/* TODO: likely replaced by multivar shoODE_drdt()
+double shoODE_dydt2(double drdt_t[], double dydt[], double t, uint Nr) {
 	(void) t;
 	(void) dydt;
 	double dydt2; // 2nd deriv of y
@@ -112,7 +121,7 @@ double shoODE_dydt2(double t, double dydt[], uint Nr) {
 		return dydt2;
 	}
 }
-
+*/
 // //////// test 1: simpleODE1 ////////  
 int euler_basic_ODE() {
 	char *fn = "data/test1.data";
@@ -162,28 +171,31 @@ int euler_sho() {
 		t[i] = t[i-1]+dt;
 	}
 	
-	double *r = (double *) malloc(Nr * N_t * sizeof(double));
+	double **r = (double **) malloc(Nr * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
-	double *drdt = (double *) malloc(Nr * N_t * sizeof(double));
+	//double *drdt = (double *) malloc(Nr * N_t * sizeof(double));
 	// double *drdt_args = (double *) malloc(Nr * sizeof(double));
 	// double *drdt2_args = (double *) malloc(Nr * sizeof(double));
 	// initial conditions
-	r[0] = 1;
-	drdt[0] = 1;
+	r[0][0] = 1;
+	//drdt[0] = 1;
+	uint j;
 	// numerical solving loop
-	for (i=0; i<N_t-1; i++) {
+	for (j=0; j<N_t-1; j++) {
 		// drdt_args[0] = drdt[i];
-		euler_single(shoODE_dydt, t[i], &r[i], dt, Nr);
+		euler_single(shoODE_drdt, t[i], r, j, dt, Nr);
 		// drdt2_args[0] = r[i];
-		euler_single(shoODE_dydt2, t[i], &drdt[i], dt, Nr); // calc drdt[i+1]
+		//euler_single(shoODE_dydt2, t[i], &drdt[i], dt, Nr); // calc drdt[i+1]
 	}
 
+	double *y = (double *) malloc(Nr * N_t * sizeof(double));
+	y = r[0];
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
-		to_bin(r, N_t, NDIMS, fn, "a") == 0) {
+		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
 		free(t);
 		free(r);
-		free(drdt);
+		//free(drdt);
 		//free(drdt_args);
 		//free(drdt2_args);
 		return 0;
@@ -218,9 +230,9 @@ int midpoint_shm() {
 	// numerical solving loop
 	for (i=0; i<N_t-1; i++) {
 		//drdt_args[0] = drdt[i];
-		midpoint_single(shoODE_dydt, t[i], &r[i], dt, Nr);
+		//midpoint_single(shoODE_drdt, t[i], &r[i], dt, Nr);
 		//drdt2_args[0] = r[i];
-		midpoint_single(shoODE_dydt2, t[i], &drdt[i], dt, Nr); // calc drdt[i+1]
+		//midpoint_single(shoODE_dydt2, t[i], &drdt[i], dt, Nr); // calc drdt[i+1]
 	}
 
 	// write output to file
