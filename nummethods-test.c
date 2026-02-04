@@ -171,14 +171,16 @@ int euler_sho() {
 		t[i] = t[i-1]+dt;
 	}
 	
-	double **r = (double **) malloc(Nr * N_t * sizeof(double));
+	double **r = alloc_2d_array(Nr, N_t);
+	//(double **) malloc(Nr * N_t * sizeof(double));
 	// TODO: to save memory, only keep current and next dydt vals.
 	//double *drdt = (double *) malloc(Nr * N_t * sizeof(double));
 	// double *drdt_args = (double *) malloc(Nr * sizeof(double));
 	// double *drdt2_args = (double *) malloc(Nr * sizeof(double));
 	// initial conditions
 	r[0][0] = 1;
-	//drdt[0] = 1;
+	r[1][0] = 1;
+
 	uint j;
 	// numerical solving loop
 	for (j=0; j<N_t-1; j++) {
