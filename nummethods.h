@@ -74,8 +74,8 @@ void rk4_single(double (*drdt)(double, double *, uint), \
 	double t, double r[], double dt, uint Nr);
 
 //currently only single var tested
-double *midpoint_single(double (*drdt_f)(double, double *, uint), \
-	double t, double r[], double dt, uint Nr);
+double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr);
 
 
 /*
