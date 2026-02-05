@@ -85,25 +85,51 @@ double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
 // then r+1 is modified. Then the 2nd slope calc uses r_mp which is 
 // STILL pointing to r passed into midpoint_single, meaning a single euler 
 // method iteration is done. No midpoint happens.
-double *midpoint_single(double (*drdt_f)(double, double *, uint), \
-	double t, double r[], double dt, uint Nr) {
-	(void) drdt_f;
-	(void) t;
-	(void) r;
-	(void) dt;
-	(void) Nr;
+double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr) {
 	// TODO: Reimplement to support multivar. Currently broken due to euler_single()
-	// and changes to how drdt() functions interface with num methods. 
-	/*
+	// and changes to how drdt() functions interface with num methods.
+	double *r_curr = (double *) malloc(Nr * sizeof(double));
+	double *k1 = (double *) malloc(Nr * sizeof(double));
+	double *r_mp = (double *) malloc(Nr * sizeof(double));
+	double *k2 = (double *) malloc(Nr * sizeof(double));
+	// read r column into r_curr array
+	uint i;
+	for (i = 0; i < Nr; i++) {
+		r_curr[i] = r[i][j_r];
+	}
 	double dt_mp = 0.5 * dt;
+
+	/*
+	//find slope k1 to get r_mp. 
+	CANT USE EULER_SINGLE, 
+	just have to implement euler here for now
+	*/
+
+	// find slope k1
+	drdt_f(k1, r_curr, t, Nr);
+	//find r_mp using k1
+	for (i = 0; i < Nr; i++) {
+		r_mp[i] = r_curr[i] + k1[i] * dt_mp; 
+	}
+	//get slope k2 using  r_mp as input
+	drdt_f(k2, r_mp, t + dt_mp, Nr);
+	for (i = 0; i < Nr; i++) {
+		r[i][j_r+1] = r_curr[i] + k2[i] * dt; 
+	}
+
+	return r;
+
 	// ERROR: euler_single returns pointer at same address passed to func.
 	// then r+1 is modified. Then
+	/*
 	double *r_mp = euler_single( \
-		drdt, t, r, dt_mp, Nr);
+	drdt_f, t, r, dt_mp, Nr);
+	*/
 	//estimate soln using midpoint slope where midpoint r_mp is r(t+dt/2) estimated using euler.
 	// WRONG: OVERWRITES THE MIDPOINT
-	*(r+1) = *r + drdt(t + dt_mp, r_mp, Nr) * dt;
-	*/
+	//*(r+1) = *r + drdt_f(t + dt_mp, r_mp, Nr) * dt;
+	
 	return r;
 }
 
