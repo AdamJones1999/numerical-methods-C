@@ -54,67 +54,10 @@ def rossler_euler_test():
 	for i in range(0, Nt-1):
 		euler_single(odes.rossler, t, r, i, dt, Nr)
 	return t, r, dt, Nt
-	
 
-
-
-if __name__=="__main__":
-	# simple harmonic oscillator ODE test
-	t_e1, r_e1, dt_e1, Nt_e1 = shmODEEulerTest()
-	t_m1, r_m1, dt_m1, Nt_m1 = shmODEMidpointTest()
-	# rossler ODE system test
-	t_e_r1, r_e_r1, dt_e_r1, Nt_e_r1 = rossler_euler_test()
-
+def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	# ---------- analytical solution to y'' + 16y = 0 ----------
 	r_shm_analytical = np.cos(4*t_e1) + 0.25*np.sin(4*t_e1)
-
-
-	# ----------------------- plotting -----------------------
-	# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	# @@@@@@@@@@@@ rossler ODE system using euler @@@@@@@@@@@@
-	plt.figure(figsize=(16, 8))
-	plt.tight_layout()
-	plt.subplot(3, 1, 1)
-	plt.plot(t_e_r1, r_e_r1[0, :])
-	plt.title(f"rosslerODEsys x vs t using euler method over t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("t")
-	plt.ylabel("x")
-
-	plt.subplot(3, 1, 2)
-	plt.plot(t_e_r1, r_e_r1[1, :])
-	plt.title(f"rosslerODEsys y vs t using euler method over t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("t")
-	plt.ylabel("y")
-
-	plt.subplot(3, 1, 3)
-	plt.plot(t_e_r1, r_e_r1[2, :])
-	plt.title(f"rosslerODEsys z vs t using euler method over t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("t")
-	plt.ylabel("z")
-
-	plt.show()
-
-	plt.figure(figsize=(10, 10))
-	plt.tight_layout()
-	plt.subplot(2, 2, 1)
-	plt.plot(r_e_r1[0, :], r_e_r1[1, :])
-	plt.title(f"rosslerODEsys x,y phase space using euler method \nover t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("x")
-	plt.ylabel("y")
-
-	plt.subplot(2, 2, 2)
-	plt.plot(r_e_r1[0, :], r_e_r1[2, :])
-	plt.title(f"rosslerODEsys x,z phase space using euler method \nover t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("x")
-	plt.ylabel("z")
-
-	plt.subplot(2, 2, 3)
-	plt.plot(r_e_r1[1, :], r_e_r1[2, :])
-	plt.title(f"rosslerODEsys y,z phase space using euler method \nover t=[{t_e_r1[0]}, {t_e_r1[Nt_e_r1-1]}], dt={dt_e_r1}")
-	plt.xlabel("y")
-	plt.ylabel("z")
-
-	plt.show()
 
 	# euler method
 	plt.figure(figsize=(16, 8))
@@ -137,3 +80,91 @@ if __name__=="__main__":
 	plt.title(f"midpoint method shmODE r-r_analytical over t=[{t_m1[0]}, {t_m1[Nt_m1-1]}], dt={dt_m1}")
 	
 	plt.show()
+
+def rossler_euler_plot(t, r, dt, Nt):
+	plt.figure(figsize=(16, 8))
+	plt.tight_layout()
+	plt.subplot(3, 1, 1)
+	plt.plot(t, r[0, :])
+	plt.title(f"rosslerODEsys x vs t using euler method over t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("t")
+	plt.ylabel("x")
+
+	plt.subplot(3, 1, 2)
+	plt.plot(t, r[1, :])
+	plt.title(f"rosslerODEsys y vs t using euler method over t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("t")
+	plt.ylabel("y")
+
+	plt.subplot(3, 1, 3)
+	plt.plot(t, r[2, :])
+	plt.title(f"rosslerODEsys z vs t using euler method over t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("t")
+	plt.ylabel("z")
+
+	plt.show()
+
+	plt.figure(figsize=(10, 10))
+	plt.tight_layout()
+	plt.subplot(2, 2, 1)
+	plt.plot(r[0, :], r[1, :])
+	plt.title(f"rosslerODEsys x,y phase space using euler method \nover t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("x")
+	plt.ylabel("y")
+
+	plt.subplot(2, 2, 2)
+	plt.plot(r[0, :], r[2, :])
+	plt.title(f"rosslerODEsys x,z phase space using euler method \nover t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("x")
+	plt.ylabel("z")
+
+	plt.subplot(2, 2, 3)
+	plt.plot(r[1, :], r[2, :])
+	plt.title(f"rosslerODEsys y,z phase space using euler method \nover t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.xlabel("y")
+	plt.ylabel("z")
+
+	plt.show()
+
+
+
+if __name__=="__main__":
+	# simple harmonic oscillator ODE test
+	t_e1, r_e1, dt_e1, Nt_e1 = shmODEEulerTest()
+	t_m1, r_m1, dt_m1, Nt_m1 = shmODEMidpointTest()
+	shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1)
+
+	# rossler ODE system test
+	t_e_r1, r_e_r1, dt_e_r1, Nt_e_r1 = rossler_euler_test()
+	rossler_euler_plot(t_e_r1, r_e_r1, dt_e_r1, Nt_e_r1)
+
+	# ---------- analytical solution to y'' + 16y = 0 ----------
+	r_shm_analytical = np.cos(4*t_e1) + 0.25*np.sin(4*t_e1)
+
+
+	# ----------------------- plotting -----------------------
+	# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	# @@@@@@@@@@@@ rossler ODE system using euler @@@@@@@@@@@@
+	'''
+	# euler method
+	plt.figure(figsize=(16, 8))
+	plt.tight_layout()
+	plt.subplot(2, 2, 1)
+	plt.plot(t_e1, r_e1[0, :])
+	plt.title(f"euler method shmODE r over t=[{t_e1[0]}, {t_e1[Nt_e1-1]}], dt={dt_e1}")
+
+	plt.subplot(2, 2, 2)
+	plt.plot(t_e1, r_e1[0, :] - r_shm_analytical)
+	plt.title(f"euler method shmODE r-r_analytical over t=[{t_e1[0]}, {t_e1[Nt_e1-1]}], dt={dt_e1}")
+
+	# midpoint method
+	plt.subplot(2, 2, 3)
+	plt.plot(t_m1, r_m1[0, :])
+	plt.title(f"midpoint method shmODE using r over t=[{t_m1[0]}, {t_m1[Nt_m1-1]}], dt={dt_m1}")
+	
+	plt.subplot(2, 2, 4)
+	plt.plot(t_m1, r_m1[0, :] - r_shm_analytical)
+	plt.title(f"midpoint method shmODE r-r_analytical over t=[{t_m1[0]}, {t_m1[Nt_m1-1]}], dt={dt_m1}")
+	
+	plt.show()
+	'''
