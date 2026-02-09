@@ -6,15 +6,13 @@ They are to be used within numerical methods defined in pynummethods.py
 
 import numpy as np
 
-def print_Nvars_err_msg(f_name, Nvars, Nvars_req):
-	print(f"{f_name} requires {Nvars_req} dep vars. Provided {Nvars}/n")
-	return
+def Nvars_err_msg(f_name: str, Nvars: int, Nvars_req: int) -> str:
+	return f"{f_name} requires {Nvars_req} dep vars. Provided {Nvars}/n"
 
-def non_linear_osc(t, rcol, Nr):
+def non_linear_osc(t: float, rcol: np.ndarray, Nr: int) -> np.ndarray:
 	Nr_req = 2
 	if (Nr != Nr_req):
-		print_Nvars_err_msg("non_linear_osc", Nr, Nr_req)
-		return
+		raise Exception(Nvars_err_msg("non_linear_osc", Nr, Nr_req))
 	else:
 		dydt = np.zeros((Nr), dtype=float)
 		x = rcol[0]
@@ -28,11 +26,10 @@ def non_linear_osc(t, rcol, Nr):
 """calculate dydt vector for y AND v for coupled ode system 
 (y'=v, v' = -16y)
 original ODE the system is recasted from: y''+16y = 0"""
-def shm(t, rcol, Nr):
+def shm(t: float, rcol: np.ndarray, Nr: int) -> np.ndarray:
 	Nr_req = 2
 	if (Nr != Nr_req):
-		print_Nvars_err_msg("shm", Nr, Nr_req)
-		return
+		raise Exception(Nvars_err_msg("shm", Nr, Nr_req))
 	else:
 		dydt = np.zeros((Nr), dtype=float) # derivatives column
 		dydt[0] = rcol[1] # y' = v
@@ -40,11 +37,10 @@ def shm(t, rcol, Nr):
 		return dydt
 
 """deterministic chaos ODE system"""
-def rossler(t, rcol, Nr):
+def rossler(t: float, rcol: np.ndarray, Nr: int) -> np.ndarray:
 	Nr_req = 3
 	if (Nr != Nr_req):
-		print_Nvars_err_msg("rossler", Nr, Nr_req)
-		return
+		raise Exception(Nvars_err_msg("rossler", Nr, Nr_req))
 	else:
 		drdt = np.zeros((Nr), dtype=float)
 		a, b, c = 0.2, 0.2, 5.7
