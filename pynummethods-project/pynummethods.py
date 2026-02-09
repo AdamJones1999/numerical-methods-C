@@ -1,16 +1,17 @@
 import numpy as np
+from collections.abc import Iterator, Callable
 
-def euler_single(drdt, t, r, i, dt, Nr):
+def euler_single(drdt: Callable[[float, np.ndarray, int], np.ndarray], t: float, r: np.ndarray, i: int, dt: float, Nr: int) -> None:
 	r[:, i+1] = r[:, i] + drdt(t, r[:, i], Nr) * dt
 	return
 
-def midpoint_single(drdt, t, r, i, dt, Nr):
+def midpoint_single(drdt: Callable[[float, np.ndarray, int], np.ndarray], t: float, r: np.ndarray, i: int, dt: float, Nr: int) -> None:
 	dt_mp = 0.5 * dt
 	euler_single(drdt, t, r, i, dt_mp, Nr)
 	r[:, i+1] = r[:, i] + drdt(t + dt_mp, r[:, i+1], Nr) * dt
 	return
 
-def rk4_single(drdt, t, r, i, dt, Nr):
+def rk4_single(drdt: Callable[[float, np.ndarray, int], np.ndarray], t: float, r: np.ndarray, i: int, dt: float, Nr: int) -> None:
 	dt_mp = 0.5 * dt
 	t_mp = t + dt_mp
 	k1 = drdt(t, r[:, i], Nr) # slope at current point
