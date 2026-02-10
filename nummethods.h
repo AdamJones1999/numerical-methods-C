@@ -78,15 +78,6 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
 
 
-//currently only single var
-void rk4_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r);
-
-//currently only single var tested
-double *midpoint_single(double (*drdt)(double, double *, double *, uint), \
-	double t, double r[], double drdt_args[], double dt, uint N_r);
-
-
 /*
 @description:
 	currently only single var!!
