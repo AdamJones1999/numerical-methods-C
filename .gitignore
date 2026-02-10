@@ -2,5 +2,6 @@ build/*
 data/*
 todo.txt
 pyrightconfig.json
+pynummethods-project/__pycache__/*
 __pycache__/*
 run.sh
