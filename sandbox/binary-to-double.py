@@ -8,7 +8,7 @@ numerical methods in c into python to plot.
 import os
 import struct
 
-datapath = "../numerical-methods-C/test.data"
+datapath = "../numerical-methods-C/test1.data"
 size_bytes = os.path.getsize(datapath)
 
 DOUBLE_SIZE = 8
@@ -25,7 +25,7 @@ with open(datapath, 'rb') as f: # "read binary" mode
 n_doub = nbytes // DOUBLE_SIZE
 print(f"n_doub: {n_doub}")
 
-st = struct.Struct(f'<{5}d')
+st = struct.Struct(f'<{n_doub}d')
 double_arr = bytearray(n_doub)
 conv_view = st.unpack(view)
 print(f"converted double values: {conv_view}")
