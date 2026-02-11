@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 
 # read in data and dimensions
 fp = sys.argv[1] #
+
+
 #method_name = sys.argv[2]
 rows = int(sys.argv[2]) # rows in data file
 cols = int(sys.argv[3]) # columns data file
