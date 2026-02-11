@@ -152,9 +152,9 @@ def non_linear_osc_rk4_plot(t, r, dt, Nt):
 	plt.figure(figsize=(16, 8))
 	plt.tight_layout()
 	plt.subplot(2, 1, 1)
-	plt.plot(t, abs(r[0, :] - analytical_soln))
-	plt.title(f"non_linear_osc using rk4: x-x_analytical over t=[{t[0]}, {t[Nt-1]}], dt={dt}")
-	plt.ylabel("abs(r-r_analytical)")
+	plt.plot(t, np.log(abs(r[0, :] - analytical_soln)))
+	plt.title(f"non_linear_osc using rk4: ln(x-x_analytical) over t=[{t[0]}, {t[Nt-1]}], dt={dt}")
+	plt.ylabel("ln(abs(r-r_analytical))")
 	plt.xlabel("t")
 
 	plt.show()
