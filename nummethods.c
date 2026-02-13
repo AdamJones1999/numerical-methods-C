@@ -55,13 +55,36 @@ double *euler_method(double (*drdt)(double, double *, double *, uint), \
 	return r;
 }
 
-void rk4_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint Nr) {
-	(void) drdt; (void) t; (void) r; (void) dt; (void) Nr;
-	return;
+double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr) {
+	(void) drdt_f; (void) dt; (void) t; (void) r; (void) dt; (void) j_r;
+	double **k = alloc_2d_array(Nr, 5);
+	//double *ptr = malloc(Nr * 5 * sizeof(k));
+	volatile uint i; volatile uint j;
+	double *row_ptr;
+	for (i=0; i<Nr; i++) {
+		for (j=0; j<Nr; j++) {
+			k[i][j] = (i+1) * (j+1);
+		}
+	}
+	// print using 1d indexing
+	printf("\n\n%d is i\n\n", i);
+	i=0;
+	for (i=0; i<Nr; i++) {
+		row_ptr = k[i];
+		for (j=0; j<Nr; j++) {
+			printf("row_ptr[%d][%d] = %f\n", i, j, row_ptr[j]);
+
+		}
+	}
+
+	//double *r_curr = (double *) malloc(Nr * sizeof(ptr));
+
+
+	return k;
 }
 
-// currently only single var!!
+// now multivar
 double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr) {
 	double *r_curr = (double *) malloc(Nr * sizeof(double));
@@ -77,7 +100,8 @@ double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
 	for (i = 0; i < Nr; i++) {
 		r[i][j_r+1] = r[i][j_r] + drdt_curr[i] * dt;
 	}
-
+	free(r_curr);
+	free(drdt_curr);
 	return r; 
 }
 
@@ -117,7 +141,10 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	for (i = 0; i < Nr; i++) {
 		r[i][j_r+1] = r_curr[i] + k2[i] * dt; 
 	}
-
+	free(r_curr);
+	free(k1);
+	free(r_mp);
+	free(k2);
 	return r;
 
 	// ERROR: euler_single returns pointer at same address passed to func.
@@ -129,8 +156,6 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	//estimate soln using midpoint slope where midpoint r_mp is r(t+dt/2) estimated using euler.
 	// WRONG: OVERWRITES THE MIDPOINT
 	//*(r+1) = *r + drdt_f(t + dt_mp, r_mp, Nr) * dt;
-	
-	return r;
 }
 
 int to_bin(double *data, uint N, uint dims, char fname[], char mode[]) {
