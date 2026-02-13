@@ -204,6 +204,28 @@ int midpoint_shm() {
 	}
 }
 
+int rk4_test() {
+	uint NDIMS = 1;
+	uint N_t = 10000;
+	double dt = 0.001;
+	uint Nr = 5;
+	double *t = (double *) malloc(N_t * sizeof(double));
+	double **r = alloc_2d_array(Nr, N_t);
+	// initial conditions
+	r[0][0] = 1;
+	r[1][0] = 1;
+	t[0] = 0;
+	uint i;
+	for (i=1; i<N_t; i++) { // init indep var array
+		t[i] = t[i-1]+dt;
+	}
+	// numerical solving loop
+	uint j;
+	j=0;
+	rk4_single(shmODE_drdt, t[j], r, j, dt, Nr);
+	return 0;
+}
+
 
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
@@ -229,7 +251,7 @@ int main() {
 	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
-	
+	run_test(rk4_test, "rk4 prelim test");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
