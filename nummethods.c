@@ -44,7 +44,7 @@ void print_2d_array(double **arr, uint nrow, uint ncol) {
 }
 
 /* euler method for intermediate steps in other numerical methods. */
-void euler_helper(double *drdt, double t, double r[], double r_next[], \
+void euler_helper(double r[], double r_next[], double drdt[], \
 	double dt, uint Nr) {
 	uint j;
 	// compute solution values up to index N
@@ -56,22 +56,43 @@ void euler_helper(double *drdt, double t, double r[], double r_next[], \
 
 double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr) {
-	(void) drdt_f; (void) dt; (void) t; (void) r; (void) dt; (void) j_r;
+	double dt_mp = 0.5 * dt;
+	double t_mp = t + dt_mp;
+	double *r_curr = (double *) malloc(Nr * sizeof(double));
 	double **k = alloc_2d_array(Nr, 5); // array of intermediate rk4 slopes
 	double **r_k = alloc_2d_array(Nr, 3); // array of intermediate r propagations required for rk4
-	double *r_curr = (double *) malloc(Nr * sizeof(ptr));
-	double *r_mp_k1 = r_rk4_slopes[0]// propagation of r by 0.5*dt using k1 as slope
-	double *r_mp_k2 // propagation of r by 0.5*dt using k2 as slope
-	double *r_ep_k3 // propagation of r by dt using k3 as slope
+	double *k1 = k[0]; // first of four slopes used in weighted rk4 slope k
+	double *k2 = k[1];
+	double *k3 = k[2];
+	double *k4 = k[3];
+	double *k_weighted = k[4]; // weighted sum of k1,2,3,4
+	double *r_mp_k1 = r_k[0]; // propagation of r by 0.5*dt using k1 as slope
+	double *r_mp_k2 = r_k[1]; // propagation of r by 0.5*dt using k2 as slope
+	double *r_ep_k3 = r_k[2]; // propagation of r by dt using k3 as slope
 	uint i;
 	// read r column into r_curr array
 	for (i = 0; i < Nr; i++) {
 		r_curr[i] = r[i][j_r];
 	}
-	// get k1
-	drdt_f(k[0], r_curr, t, Nr);
-	for 
-	
+	// calculate k1 slopes
+	drdt_f(k1, r_curr, t, Nr);
+	// propagate r to midpoint using k1 slopes
+	euler_helper(r_curr, r_mp_k1, k1, dt_mp, Nr);
+	// calculate k2 slopes at midpoint
+	drdt_f(k2, r_mp_k1, t_mp, Nr);
+	// propagate r to midpoint using k2 slopes
+	euler_helper(r_curr, r_mp_k2, k2, dt_mp, Nr);
+	// calculate k3 slopes at midpoint
+	drdt_f(k3, r_mp_k2, t_mp, Nr);
+	// propagate r to endpoint using k3 slopes
+	euler_helper(r_curr, r_ep_k3, k3, dt, Nr);
+	// calculate k4 slopes at endpoint
+	drdt_f(k4, r_ep_k3, t + dt, Nr);
+	// calculate the weighted slope then propagate r to next solution step
+	for (i = 0; i < Nr; i++) {
+		k_weighted[i] = k1[i] / 6.0 + k2[i] / 3.0 + k3[i] / 3.0 + k4[i] / 6.0;
+		r[i][j_r + 1] = r[i][j_r] + k_weighted[i] * dt;
+	}
 	/*
 	uint j;
 	double *row_ptr;
@@ -83,14 +104,9 @@ double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 		for (j=0; j<Nr; j++) {
 			printf("row_ptr[%d] = %f\n", j, row_ptr[j]);
 			printf("   k[%d][%d] = %f\n", i, j, k[i][j]);
-
 		}
 	}*/
-
-	//double *r_curr = (double *) malloc(Nr * sizeof(ptr));
-
-
-	return k;
+	return r;
 }
 
 // now multivar

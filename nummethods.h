@@ -41,7 +41,7 @@ void print_2d_array(double **arr, uint nrow, uint ncol);
 @return: 
 	r_next[]: pointer to array containing propagated solution.
 */
-double *euler_helper(double *drdt, double t, double r[], double r_next[], \
+void euler_helper(double r[], double r_next[], double drdt[], \
 	double dt, uint Nr);
 
 /* 
