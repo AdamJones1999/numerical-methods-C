@@ -59,8 +59,8 @@ double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 	double dt_mp = 0.5 * dt;
 	double t_mp = t + dt_mp;
 	double *r_curr = (double *) malloc(Nr * sizeof(double));
-	double **k = alloc_2d_array(Nr, 5); // array of intermediate rk4 slopes
-	double **r_k = alloc_2d_array(Nr, 3); // array of intermediate r propagations required for rk4
+	double **k = alloc_2d_array(5, Nr); // array of intermediate rk4 slopes
+	double **r_k = alloc_2d_array(3, Nr); // array of intermediate r propagations required for rk4
 	double *k1 = k[0]; // first of four slopes used in weighted rk4 slope k
 	double *k2 = k[1];
 	double *k3 = k[2];
