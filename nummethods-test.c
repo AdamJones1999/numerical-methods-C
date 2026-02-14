@@ -106,9 +106,10 @@ int euler_basic_ODE() {
 	// dep+indep vars output array
 	// double *tr = (double *) malloc(N_t * (1 + Nr) * sizeof(double));	
 	r[0] = 1; // initial dep var value for ivp
+	/*
 	euler_method(simpleODE1, t, r, NULL, dt, N_t, Nr);
 	//printf("%d element solution r: \n{ %f, %f, %f, %f, %f }\n", N_t, r[0], r[1], r[2], r[3], r[4]);
-
+	*/
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
 		to_bin(r, Nr * N_t, NDIMS, fn, "a") == 0) {
 		free(t);
@@ -149,7 +150,7 @@ int euler_shm() {
 	}
 
 	// making 1D array for data output
-	double *y = (double *) malloc(Nr * N_t * sizeof(double));
+	double *y = (double *) malloc(N_t * sizeof(double));
 	y = r[0];
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
@@ -189,7 +190,7 @@ int midpoint_shm() {
 	}
 
 	// making 1D array for data output
-	double *y = (double *) malloc(Nr * N_t * sizeof(double));
+	double *y = (double *) malloc(N_t * sizeof(double));
 	y = *r;
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
@@ -205,25 +206,42 @@ int midpoint_shm() {
 }
 
 int rk4_test() {
+	char *fn = "data/test4.data";
 	uint NDIMS = 1;
-	uint N_t = 10000;
+	uint Nt = 10000;
 	double dt = 0.001;
-	uint Nr = 5;
-	double *t = (double *) malloc(N_t * sizeof(double));
-	double **r = alloc_2d_array(Nr, N_t);
+	uint Nr = 2;
+	double *t = (double *) malloc(Nt * sizeof(double));
+	double **r = alloc_2d_array(Nr, Nt);
 	// initial conditions
 	r[0][0] = 1;
 	r[1][0] = 1;
 	t[0] = 0;
 	uint i;
-	for (i=1; i<N_t; i++) { // init indep var array
+	for (i=1; i<Nt; i++) { // init indep var array
 		t[i] = t[i-1]+dt;
 	}
+
 	// numerical solving loop
 	uint j;
-	j=0;
-	rk4_single(shmODE_drdt, t[j], r, j, dt, Nr);
-	return 0;
+	for (j = 0; j < Nt; j++) {
+		rk4_single(shmODE_drdt, t[j], r, j, dt, Nr);
+	}
+
+	// making 1D array for data output
+	double *y = (double *) malloc(Nr * Nt * sizeof(double));
+	y = *r;
+	// write output to file
+	if (to_bin(t, Nt, NDIMS, fn, "w") == 0 && \
+		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
+		free(t);
+		free(r);
+		return 0;
+	}
+	else { 
+		printf("writing to %s failed\n", fn);
+		return -1;
+	}
 }
 
 
