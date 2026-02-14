@@ -24,32 +24,28 @@ void print_2d_array(double **arr, uint nrow, uint ncol);
 /*
 ************* depreciated: still uses drdt_args[] *************
 @description:
-	this function implements the euler method for solving a 1st order ODE
-	ODE of this form:
+	this function implements one step of the euler method for 
+	solving a 1st order	ODE of this form:
 		d(x(t))/dt = f(x(t), t)
-	does not support solving for slopes in coupled systems 
-	(slopes depend on prev slopes from other equations in system of ODEs).
-
+	where the slopes are already found. This version of the 
+	euler method is intended for intermediate steps in other numerical methods.  
 @params:
-	TODO: UPDATE TO REFLECT DRDT_ARGS CHANGE
-	drdt: pointer to function encoding differential equation. 
-	r[]: pointer to array that solution will be put in.
-	t[]: pointer to independent variable step array (t as it is usually time)
-	N: number of elements in t[].
-	dt: different between t and next independent var value.
-	N_r: number of dependent variables in the ODE system.
+	drdt: 1d array of pre-calculated slopes.
+	t: independent variable value
+	r[]: 1d array of var values at current soln step
+	r_next[]: 1d array of var values at next soln step.
+	dt: step of indep variable
+	Nr: number of dependent variables.
 @precond:
-	t[]: must contain N_t elements of elements all with the same difference 
-	bewteen adjacent elements.
-	r[]: must contain initial value x[0] for the euler method to start with. 
-		each variable in x[] must have N_t elements.
+	r[]: every element must have a double in it.
 @return: 
-	r: pointer to array containing solution.
+	r_next[]: pointer to array containing propagated solution.
 */
-double *euler_method(double (*drdt)(double, double *, double *, uint), \
-	double t[], double r[], double drdt_args[], double dt, uint Nt, uint Nr);
+double *euler_helper(double *drdt, double t, double r[], double r_next[], \
+	double dt, uint Nr);
 
 /* 
+TODO: update depreciated docs
 @description: 
 	computes a single iteration of the euler method in place within r[], where 
 	param drdt() is the derivative at t. Suitable in systems of coupled ODEs.
@@ -70,8 +66,8 @@ double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
 
 //currently only single var
-void rk4_single(double (*drdt)(double, double *, uint), \
-	double t, double r[], double dt, uint Nr);
+double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
+	double t, double **r, uint j_r, double dt, uint Nr);
 
 //currently only single var tested
 double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \

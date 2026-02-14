@@ -43,40 +43,49 @@ void print_2d_array(double **arr, uint nrow, uint ncol) {
 	return;
 }
 
-// depreciated. still uses drdt_args[]
-double *euler_method(double (*drdt)(double, double *, double *, uint), \
-	double t[], double r[], double drdt_args[], double dt, uint Nt, uint Nr) {
-	uint i;
-	(void) drdt_args;
+/* euler method for intermediate steps in other numerical methods. */
+void euler_helper(double *drdt, double t, double r[], double r_next[], \
+	double dt, uint Nr) {
+	uint j;
 	// compute solution values up to index N
-	for (i=0; i<Nt-1; i++) {
-		r[i+1] = r[i] + drdt(t[i], &r[i], &drdt_args[i], Nr) * dt;
+	for (j = 0; j < Nr; j++) {
+		r_next[j] = r[j] + drdt[j] * dt;
 	} 
-	return r;
+	return;
 }
 
 double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr) {
 	(void) drdt_f; (void) dt; (void) t; (void) r; (void) dt; (void) j_r;
-	double **k = alloc_2d_array(Nr, 5);
-	//double *ptr = malloc(Nr * 5 * sizeof(k));
-	volatile uint i; volatile uint j;
-	double *row_ptr;
-	for (i=0; i<Nr; i++) {
-		for (j=0; j<Nr; j++) {
-			k[i][j] = (i+1) * (j+1);
-		}
+	double **k = alloc_2d_array(Nr, 5); // array of intermediate rk4 slopes
+	double **r_k = alloc_2d_array(Nr, 3); // array of intermediate r propagations required for rk4
+	double *r_curr = (double *) malloc(Nr * sizeof(ptr));
+	double *r_mp_k1 = r_rk4_slopes[0]// propagation of r by 0.5*dt using k1 as slope
+	double *r_mp_k2 // propagation of r by 0.5*dt using k2 as slope
+	double *r_ep_k3 // propagation of r by dt using k3 as slope
+	uint i;
+	// read r column into r_curr array
+	for (i = 0; i < Nr; i++) {
+		r_curr[i] = r[i][j_r];
 	}
+	// get k1
+	drdt_f(k[0], r_curr, t, Nr);
+	for 
+	
+	/*
+	uint j;
+	double *row_ptr;
 	// print using 1d indexing
 	printf("\n\n%d is i\n\n", i);
 	i=0;
 	for (i=0; i<Nr; i++) {
 		row_ptr = k[i];
 		for (j=0; j<Nr; j++) {
-			printf("row_ptr[%d][%d] = %f\n", i, j, row_ptr[j]);
+			printf("row_ptr[%d] = %f\n", j, row_ptr[j]);
+			printf("   k[%d][%d] = %f\n", i, j, k[i][j]);
 
 		}
-	}
+	}*/
 
 	//double *r_curr = (double *) malloc(Nr * sizeof(ptr));
 
