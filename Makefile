@@ -2,7 +2,7 @@
 
 CC = gcc # c compiler used
 CFLAGS = -g # compiler flags (-g: enable debugging)
-LIBS = # syntax: -l<lib_name> (omit <>)
+LIBS = -lm # syntax: -l<lib_name> (omit <>)
 LIB_DIRS = # syntax: -L<dir> (omit <>)
 CPPFLAGS = -O2 -Wall -Wextra -pedantic
 
@@ -27,7 +27,7 @@ make-dir:
 OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o
 
 $(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LFLAGS)
 
 $(OBJ_DIR)/nummethods-test.o: $(SRC_DIR)/nummethods-test.c $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods-test.c \
