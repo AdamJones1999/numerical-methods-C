@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
 #include <nummethods.h>
 
 
@@ -211,8 +212,14 @@ int rk4_test() {
 	uint Nt = 10000;
 	double dt = 0.001;
 	uint Nr = 2;
+	/* acceptable error slope for var in r[0] (y, in the ODE) 
+	found via heuristic of running rk4 simulation
+	and reading the rate of change of error off the graph and rounding up.
+	units: [dependent var/indep var]*/
+	double r0_err_slope = 1e-11; // 8.79 *10^(-12) actual slope
 	double *t = (double *) malloc(Nt * sizeof(double));
 	double **r = alloc_2d_array(Nr, Nt);
+	double *r_analytical = (double *) malloc(Nt * sizeof(double));
 	// initial conditions
 	r[0][0] = 1;
 	r[1][0] = 1;
@@ -221,11 +228,23 @@ int rk4_test() {
 	for (i=1; i<Nt; i++) { // init indep var array
 		t[i] = t[i-1]+dt;
 	}
+	// error analysis
+	//double err_max = 0;
+	//double i_err_max = 0;
 
-	// numerical solving loop
+	/* loop to solve numerically and analytically and 
+	verify the numerical solution is within 
+	heuristically determined error bounds */
 	uint j;
 	for (j = 0; j < Nt; j++) {
 		rk4_single(shmODE_drdt, t[j], r, j, dt, Nr);
+		// analytical solution to y'' + 16y = 0
+		r_analytical[j] = cos(4.0*t[j]) + 0.25 * sin(4.0*t[j]);
+		if ((r[0][j] - r_analytical[j]) > (r0_err_slope * t[j])) {
+			printf("ERROR: element r[0][%d] = %E has error %E > acceptable error %E.\n", \
+				j, r[0][j], r[0][j] - r_analytical[j], r0_err_slope * t[j]);
+			return -1;
+		}
 	}
 
 	// making 1D array for data output
