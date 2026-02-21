@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <nummethods.h>
+#include <odesystems.h>
 
 
 int malloc_2d_array_tests() {
@@ -255,6 +256,7 @@ int rk4_test() {
 		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
 		free(t);
 		free(r);
+		free(y);
 		return 0;
 	}
 	else { 
@@ -263,6 +265,64 @@ int rk4_test() {
 	}
 }
 
+/*
+origin of xyz coord system is center of the earth at equator.
+Earth is assumed to be a sphere.
+*/
+int rk4_orditalmotion_test() {
+	char *fn = "data/test4.data";
+	uint NDIMS = 1;
+	uint Nt = 100*60*100; // 100 minutes for dt = 0.01s
+	double dt = 0.01; // [s]
+	uint Nr = 7;
+	double perigee = 480; // [km] perigee of Low Earth Orbit (LEO)
+	double R_e = 6378; // [km] radius of earth
+	double m0 = 2000; // initial mass of rocket
+	double *t = (double *) malloc(Nt * sizeof(double));
+	double **r = alloc_2d_array(Nr, Nt);
+	/*initial conditions
+	row 0 to 2: init xyz coords, 3 to 5: init xyz velocities, 6: init mass
+	*/
+	r[0][0] = R_e + perigee; // [km]
+	r[1][0] = 0; // [km]
+	r[2][0] = 0; // [km]
+	r[3][0] = 0; // [km/s]
+	r[4][0] = 7.7102; // [km/s]
+	r[5][0] = 0; // [km/s]
+	r[6][0] = m0; // [kg]
+	t[0] = 0;
+	uint i;
+	for (i=1; i < Nt; i++) { // init indep var array
+		t[i] = t[i-1]+dt;
+	}
+
+	uint j;
+	for (j = 0; j < Nt - 1; j++) {
+		rk4_single(orbitalmotion, t[j], r, j, dt, Nr);
+	}
+
+	// making 1D array for data output
+	double *x = (double *) malloc(Nr * Nt * sizeof(double));
+	double *y = (double *) malloc(Nr * Nt * sizeof(double));
+	x = r[0];
+	y = r[1];
+
+	// write output to file
+	if (to_bin(t, Nt, NDIMS, fn, "w") == 0 && \
+		to_bin(x, Nt, NDIMS, fn, "a") == 0 && \
+		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
+		free(t);
+		free(r);
+		free(x);
+		free(y);
+		return 0;
+	}
+	else { 
+		printf("writing to %s failed\n", fn);
+		return -1;
+	}
+
+}
 
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
@@ -289,6 +349,7 @@ int main() {
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
 	run_test(rk4_test, "rk4 prelim test");
+	run_test(rk4_orditalmotion_test, "rk4 hohmann transfer model test");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
