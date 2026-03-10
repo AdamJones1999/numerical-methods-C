@@ -277,18 +277,20 @@ int rk4_orbitalmotion_test() {
 	double perigee = 480; // [km] perigee of Low Earth Orbit (LEO)
 	double R_e = 6378; // [km] radius of earth
 	double m0 = 2000; // initial mass of rocket
+	double apogee; // [km]
+	double apogee_err = 0.05; // [km] error tolerance for apogee target of 800km
 	double *t = (double *) malloc(Nt * sizeof(double));
 	double **r = alloc_2d_array(Nr, Nt);
 	/*initial conditions
 	row 0 to 2: init xyz coords, 3 to 5: init xyz velocities, 6: init mass
 	*/
-	r[0][0] = R_e + perigee; // [km]
-	r[1][0] = 0; // [km]
-	r[2][0] = 0; // [km]
-	r[3][0] = 0; // [km/s]
-	r[4][0] = 7.7102; // [km/s]
-	r[5][0] = 0; // [km/s]
-	r[6][0] = m0; // [kg]
+	r[0][0] = R_e + perigee; // [km] x position
+	r[1][0] = 0; // [km] y position
+	r[2][0] = 0; // [km] z position
+	r[3][0] = 0; // [km/s] vx (x velocity)
+	r[4][0] = 7.7102; // [km/s] vy
+	r[5][0] = 0; // [km/s] vz
+	r[6][0] = m0; // [kg] mass of rocket
 	t[0] = 0;
 	uint i;
 	for (i=1; i < Nt; i++) { // init indep var array
@@ -298,6 +300,27 @@ int rk4_orbitalmotion_test() {
 	uint j;
 	for (j = 0; j < Nt - 1; j++) {
 		rk4_single(orbitalmotion, t[j], r, j, dt, Nr);
+	}
+
+	// verifying apogee of 800 km
+	j = 2;
+	// start 2 steps after orbit begins and trigger when orbit crosses x axis (y = 0)
+	while (r[1][j] >= 0.0 && j < Nt - 1) {
+		j++;
+	}
+	if (j < Nt - 1) {
+		apogee = -r[0][j] - R_e;
+		if ((apogee - 800.0) > apogee_err) {
+			printf("ERROR: orbitalmotion() produced an apogee of %f which is more than allowed %f km away from an 800 km target.\n", apogee, apogee_err);
+			return -1;
+		}
+		else {
+			printf("apogee altitude found at element x[%d] = %f which is within %f of target 800 km\n", j, apogee, apogee_err);
+		}
+	}
+	else {
+		printf("ERROR: apogee never found\n");
+		return -1;
 	}
 
 	// making 1D array for data output
