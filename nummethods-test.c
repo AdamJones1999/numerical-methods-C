@@ -157,7 +157,7 @@ int euler_shm() {
 	// write output to file
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
 		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
-		free(t);
+		free_2d_array((void **) t);
 		free(r);
 		return 0;
 	}
@@ -198,7 +198,7 @@ int midpoint_shm() {
 	if (to_bin(t, N_t, NDIMS, fn, "w") == 0 && \
 		to_bin(y, N_t, NDIMS, fn, "a") == 0) {
 		free(t);
-		free(r);
+		free_2d_array((void **) r);
 		return 0;
 	}
 	else { 
@@ -255,8 +255,7 @@ int rk4_test() {
 	if (to_bin(t, Nt, NDIMS, fn, "w") == 0 && \
 		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
 		free(t);
-		free(r);
-		free(y);
+		free_2d_array((void **) r);
 		return 0;
 	}
 	else { 
@@ -269,8 +268,8 @@ int rk4_test() {
 origin of xyz coord system is center of the earth at equator.
 Earth is assumed to be a sphere.
 */
-int rk4_orditalmotion_test() {
-	char *fn = "data/test4.data";
+int rk4_orbitalmotion_test() {
+	char *fn = "data/test5.data";
 	uint NDIMS = 1;
 	uint Nt = 100*60*100; // 100 minutes for dt = 0.01s
 	double dt = 0.01; // [s]
@@ -312,9 +311,7 @@ int rk4_orditalmotion_test() {
 		to_bin(x, Nt, NDIMS, fn, "a") == 0 && \
 		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
 		free(t);
-		free(r);
-		free(x);
-		free(y);
+		free_2d_array((void **) r);
 		return 0;
 	}
 	else { 
@@ -344,12 +341,12 @@ int main() {
 	// //////////////// START TESING ////////////////
 	
 	run_test(malloc_2d_array_tests, "writing then reading from 2d array with row ptrs");
-	//run_test(free_2d_array_tests, "freeing array and (if uncommented) causing segfault to verify memory is freed");
-	run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
+	// run_test(free_2d_array_tests, "freeing array and (if uncommented) causing segfault to verify memory is freed");
+	// run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
 	run_test(rk4_test, "rk4 prelim test");
-	run_test(rk4_orditalmotion_test, "rk4 hohmann transfer model test");
+	run_test(rk4_orbitalmotion_test, "rk4 hohmann transfer model test");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
