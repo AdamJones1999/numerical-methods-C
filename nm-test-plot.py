@@ -25,6 +25,7 @@ def shm_plot(data_2d: np.ndarray) -> None:
 
 def holmann_transfer_test(data_2d: np.ndarray) -> None:
 	nrows = data_2d.shape[0]
+	ncols = data_2d.shape[1]
 	if (nrows != 3):
 		raise Exception(f"holmann transfer test: should have 3 rows, got {nrows}.\n")
 	t = data_2d[0] # indep var 
@@ -40,10 +41,12 @@ def holmann_transfer_test(data_2d: np.ndarray) -> None:
 	earth_y = R_e * np.sin(theta)
 
 	# finding apogee
-	while y[i] >= 0:
+	# while orbital motion is above x axis 2 steps after start of orbit (first 180 degrees of orbit)
+	while y[i] >= 0 and i < (ncols - 1):
 		i = i+1
+	apogee = -x[i] - R_e
 	print(f"i={i}\n")
-	print(f"apogee altitude = R_e - x[{i}] = {-x[i]} - {R_e} = {-x[i] - R_e}\n")
+	print(f"apogee altitude = R_e - x[{i}] = {-x[i]} - {R_e} = {apogee}\n")
 
 	# plotting
 	ax1 = plt.subplot(1, 1, 1)
