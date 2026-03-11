@@ -278,7 +278,7 @@ int rk4_orbitalmotion_test() {
 	double R_e = 6378; // [km] radius of earth
 	double m0 = 2000; // initial mass of rocket
 	double apogee; // [km]
-	double apogee_err = 0.05; // [km] error tolerance for apogee target of 800km
+	double target_apogee_err = 0.05; // [km] error tolerance for apogee target of 800km
 	double *t = (double *) malloc(Nt * sizeof(double));
 	double **r = alloc_2d_array(Nr, Nt);
 	/*initial conditions
@@ -310,12 +310,12 @@ int rk4_orbitalmotion_test() {
 	}
 	if (j < Nt - 1) {
 		apogee = -r[0][j] - R_e;
-		if ((apogee - 800.0) > apogee_err) {
-			printf("ERROR: orbitalmotion() produced an apogee of %f which is more than allowed %f km away from an 800 km target.\n", apogee, apogee_err);
+		if ((apogee - 800.0) > target_apogee_err) {
+			printf("ERROR: orbitalmotion() produced an apogee of %f which is more than allowed %f km away from an 800 km target.\n", apogee, target_apogee_err);
 			return -1;
 		}
 		else {
-			printf("apogee altitude found at element x[%d] = %f which is within %f of target 800 km\n", j, apogee, apogee_err);
+			printf("apogee altitude found at element x[%d] = %f which is within %f of target 800 km\n", j, apogee, target_apogee_err);
 		}
 	}
 	else {
@@ -344,6 +344,101 @@ int rk4_orbitalmotion_test() {
 
 }
 
+
+int rk4_orbitalburn_test() {
+	char *fn = "data/test6.data";
+	uint NDIMS = 1;
+	double dt = 0.01; // [s]
+	double total_apogee; // [km]
+	double apogee_err; // [km]
+	double target_total_apogee = 22378; // [km]
+	// double target_apogee_err = 10; // [km] error tolerance for total apogee target
+	double burn_time = 261.11; // [s]
+	uint burn_end_i = (uint) round(burn_time / dt) - 1; // index of end of orbital burn time.
+	uint dt_per_sec = ceil(1 / dt);
+	printf("dt per sec: %d\n", dt_per_sec);
+	uint Nt = burn_end_i + 250*60*dt_per_sec; // burn time + 250 minutes in Transfer Orbit
+	uint Nr = 7;
+	double perigee = 480; // [km] perigee of Low Earth Orbit (LEO)
+	double R_e = 6378; // [km] radius of earth
+	double m0 = 2000; // initial mass of rocket
+	
+	double *t = (double *) malloc(Nt * sizeof(double));
+	double **r = alloc_2d_array(Nr, Nt);
+	/*initial conditions
+	row 0 to 2: init xyz coords, 3 to 5: init xyz velocities, 6: init mass
+	*/
+	r[0][0] = R_e + perigee; // [km] x position start at perigee of orbit
+	r[1][0] = 0; // [km] y position
+	r[2][0] = 0; // [km] z position
+	r[3][0] = 0; // [km/s] vx (x velocity)
+	r[4][0] = 7.7102; // [km/s] vy initial at perigee
+	r[5][0] = 0; // [km/s] vz
+	r[6][0] = m0; // [kg] mass of rocket
+	t[0] = 0;
+	uint i;
+	for (i=1; i < Nt; i++) { // init indep var array
+		t[i] = t[i-1]+dt;
+	}
+
+	uint j;
+	// orbital burn from 0s to 'burn_time' seconds to get from LEO to 
+	// Transfer Ellipse Orbit
+	for (j = 0; j < burn_end_i; j++) {
+		rk4_single(orbitalburn, t[j], r, j, dt, Nr);
+	}
+	printf("index to stop orbital burn: %d\n", burn_end_i);
+	printf("j after orbital burn: %d\n", j);
+	// Transfer Ellipse Orbit where spacecraft can coast with no thrust, 
+	// thus using orbitalmotion ODE system due to no thrust component required
+	for (;j < Nt - 1; j++) {
+		rk4_single(orbitalmotion, t[j], r, j, dt, Nr);
+	}
+
+	// verifying apogee of 800 km
+	j = burn_end_i;
+	// continue transfer orbit with booster off and trigger when orbit changes x direction
+	// orbit does not necessarily turn around when y = 0. I think this is due to 
+	// numerical error propagation.
+	while (r[0][j] - r[0][j-1] <= 0.0 && j < Nt - 1) {
+		j++;
+	}
+	if (j < Nt - 1) {
+		total_apogee = -r[0][j];
+		apogee_err = total_apogee - target_total_apogee;
+		printf("found at element x[%d], orbitalburn() into orbitalmotion() produced a total apogee of \n%f which is %f km away from an 22,378 km target.\n", j, total_apogee, apogee_err);
+		/*
+		else {
+			printf("apogee altitude found at element x[%d] = %f which is within %f of target 800 km\n", j, total_apogee, apogee_err);
+		}*/
+	}
+	else {
+		printf("ERROR: apogee never found\n");
+		return -1;
+	}
+
+	// making 1D array for data output
+	double *x = (double *) malloc(Nr * Nt * sizeof(double));
+	double *y = (double *) malloc(Nr * Nt * sizeof(double));
+	x = r[0];
+	y = r[1];
+
+	// write output to file
+	if (to_bin(t, Nt, NDIMS, fn, "w") == 0 && \
+		to_bin(x, Nt, NDIMS, fn, "a") == 0 && \
+		to_bin(y, Nt, NDIMS, fn, "a") == 0) {
+		free(t);
+		free_2d_array((void **) r);
+		return 0;
+	}
+	else { 
+		printf("writing to %s failed\n", fn);
+		return -1;
+	}
+
+}
+
+
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
@@ -369,7 +464,8 @@ int main() {
 	run_test(euler_shm, "euler method simple harmonic motion: y'' + 16y = 0");
 	run_test(midpoint_shm, "midpoint method simple harmonic motion: y'' + 16y = 0");
 	run_test(rk4_test, "rk4 prelim test");
-	run_test(rk4_orbitalmotion_test, "rk4 hohmann transfer model test");
+	run_test(rk4_orbitalmotion_test, "rk4 hohmann ordbitalmotion model test");
+	run_test(rk4_orbitalburn_test, "rk4 hohmann ordbitalburn model test");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
