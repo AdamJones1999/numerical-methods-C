@@ -14,7 +14,7 @@ void orbitalburn(double drdt_t[], double r_t[], double t, uint Nr) {
 	double mu = 3.986e5; // [km^3/s^2] gavitational param. calc'd from Newtons grav. const. & mass of Earth
 	double g = 9.81e-3; // [km/s^2]
 	double Isp = 300; // [s] specific impulse of thruster
-	double T = 1e4; // thrust [kN]
+	double T = 10; // thrust [kg*km/s^2] = 1000 * [kg*m/s^2]
 
 	// dependent variables
 	double x = r_t[0];
