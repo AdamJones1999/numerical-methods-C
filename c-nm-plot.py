@@ -78,14 +78,6 @@ def holmann_orbitalburn_test(data_2d: np.ndarray) -> None:
 	earth_x = R_e * np.cos(theta)
 	earth_y = R_e * np.sin(theta)
 
-	# finding apogee
-	# while orbital motion is above x axis 2 steps after start of orbit (first 180 degrees of orbit)
-	i=2
-	while x[i] >= 6857.9856 and i < (ncols - 1):
-		i = i+1
-	print(f"i={i}\n")
-	print(f"{x[i-5:i+5]}\n")
-
 	# plotting
 	ax1 = plt.subplot(1, 1, 1)
 
