@@ -345,6 +345,23 @@ int rk4_orbitalmotion_test() {
 }
 
 
+/*
+finds and displays to stdout the answers to EP428_lab2_q4d about orbital burn velocity magnitude changes and propellant mass used
+*/
+void ep428_lab2_q4d(double vx_end_burn, double vy_end_burn, double vz_end_burn, double v0, double propellent_used) {
+	// all speed and velocities in [km/s] all masses in [kg]
+	printf("@@@@@@@@@@@@@ START EP428 lab2 question 4d @@@@@@@@@@@@@\n");
+	double v_end_burn = sqrt(vx_end_burn*vx_end_burn + vy_end_burn*vy_end_burn + vz_end_burn*vz_end_burn);
+	double v_orbital_burn_diff = v_end_burn - v0;
+	double target_v_orbital_burn_diff = 1.723; // [km/s]
+	double v_orbital_burn_diff_err = v_orbital_burn_diff - target_v_orbital_burn_diff;
+	printf("Rocket velocities at end of orbital burn (all in km/s):\n vx: %f\n vy: %f\n vz:  %f\n v: %f\nEnd of orbital burn speed - starting speed = %f km/s\nThis is %f km/s off of the change in velocity magnitude imparted by the thruster of %f km/s predicted by the approximate impulse theory.\n\n", \
+		vx_end_burn, vy_end_burn, vz_end_burn, v_end_burn, v_orbital_burn_diff, v_orbital_burn_diff_err, target_v_orbital_burn_diff);
+	printf("Amount of propellant used in orbital burn: %f kg\n", propellent_used);
+	printf("@@@@@@@@@@@@@ END EP428 lab2 question 4d   @@@@@@@@@@@@@\n");
+}
+
+
 int rk4_orbitalburn_test() {
 	char *fn = "data/test6.data";
 	uint NDIMS = 1;
@@ -387,6 +404,12 @@ int rk4_orbitalburn_test() {
 	for (j = 0; j < burn_end_i; j++) {
 		rk4_single(orbitalburn, t[j], r, j, dt, Nr);
 	}
+
+	// answering ep428_lab2_q4d
+	double v0 = sqrt(r[3][0]*r[3][0] + r[4][0]*r[4][0] + r[5][0]*r[5][0]);
+	double orbital_burn_propellent = m0 - r[6][j-1]; // [kg]
+	ep428_lab2_q4d(r[3][j-1], r[4][j-1], r[5][j-1], v0, orbital_burn_propellent);
+	
 	printf("index to stop orbital burn: %d\n", burn_end_i);
 	printf("j after orbital burn: %d\n", j);
 	// Transfer Ellipse Orbit where spacecraft can coast with no thrust, 
