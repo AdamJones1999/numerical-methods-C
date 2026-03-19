@@ -183,6 +183,14 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	//*(r+1) = *r + drdt_f(t + dt_mp, r_mp, Nr) * dt;
 }
 
+
+double **jacobian(void (*f)(double *, double *, uint), double x[], double **jacob_mat, double delta, uint Nr) {
+	(void) f; (void) x; (void) delta; (void) Nr;
+	// use memcpy to get x[] + delta from x[]
+	return jacob_mat;
+}
+
+
 int to_bin(double *data, uint N, uint dims, char fname[], char mode[]) {
 	FILE *fp;
 	if ((fp = fopen(fname, mode)) == NULL) {
