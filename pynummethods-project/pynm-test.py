@@ -1,5 +1,6 @@
 import numpy as np
 import pynmODESystems as odes
+import pynmLinearSystems as linsystems
 from matplotlib import pyplot  as plt
 from typing import Tuple
 import pynummethods as nm
@@ -70,6 +71,35 @@ def non_linear_osc_rk4_test() -> Tuple[np.ndarray, np.ndarray, float, int]:
 		nm.rk4_single(odes.non_linear_osc, t[i], r, i, dt, Nr)
 	return t, r, dt, Nt
 
+def jacobian_test():
+	Nr = 2
+	jacob = np.ndarray((Nr, Nr))
+	jacob_expl = np.ndarray((Nr, Nr))
+	r_guess = np.array([5.0, 4.0], dtype=float) # initial guess
+	f_r = np.ndarray((2,))
+	f_perturbed = np.ndarray((2,))
+	r_perturbed = r_guess.copy() # shallow copy is enough for floats (immutable obj)
+	
+	print(f"r guess: {r_guess}")
+	delta = 0.01 # perturbation for forward difference
+	nm.jacobian(linsystems.NR_test_ls, jacob, r_guess, delta, Nr)
+	print(f"jacob: \n{jacob}")
+	# explicitly calculate jacobian
+	linsystems.NR_test_ls(f_r, r_guess, Nr) # calc f_1&2
+	r_perturbed[0] += delta
+	linsystems.NR_test_ls(f_perturbed, r_perturbed, Nr) # calc f_perturbed_0 1&2
+	r_perturbed[0] -= delta
+	jacob_expl[0] = (f_perturbed - f_r) / delta
+	r_perturbed[1] += delta
+	linsystems.NR_test_ls(f_perturbed, r_perturbed, Nr) # calc f_perturbed_1 1&2
+	r_perturbed[1] -= delta
+	jacob_expl[1] = (f_perturbed - f_r) / delta
+	print(f"jacob_expl: \n{jacob_expl}")
+
+	#df1dx = linsystems.NR_test_ls(f_r, )
+
+
+
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	# ---------- analytical solution to y'' + 16y = 0 ----------
 	x_shm_analytical = np.cos(4*t_e1) + 0.25*np.sin(4*t_e1)
@@ -97,6 +127,7 @@ def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	plt.title(f"midpoint method shmODE r-r_analytical over t=[{t_m1[0]}, {t_m1[Nt_m1-1]}], dt={dt_m1}")
 	
 	plt.show()
+
 
 def rossler_euler_plot(t, r, dt, Nt):
 	plt.figure(figsize=(16, 8))
@@ -143,6 +174,7 @@ def rossler_euler_plot(t, r, dt, Nt):
 
 	plt.show()
 
+
 def non_linear_osc_rk4_plot(t, r, dt, Nt):
 
 	# analytical soln
@@ -172,5 +204,8 @@ if __name__=="__main__":
 	rossler_euler_plot(t_e_r1, r_e_r1, dt_e_r1, Nt_e_r1)
 	'''
 	# non linear oscillator using rk4 test
-	t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1 = non_linear_osc_rk4_test()
-	non_linear_osc_rk4_plot(t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1)
+	# t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1 = non_linear_osc_rk4_test()
+	# non_linear_osc_rk4_plot(t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1)
+
+	# jacobian test
+	jacobian_test()
