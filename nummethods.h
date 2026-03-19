@@ -74,6 +74,9 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
 
 
+double **jacobian(void (*f)(double *, double *, uint), double x[], double **jacob_mat, \
+	double delta, uint Nr);
+
 /*
 @description:
 	currently only single var!!
