@@ -21,3 +21,17 @@ def rk4_single(drdt: Callable[[float, np.ndarray, int], np.ndarray], t: float, r
 	k = k1 / 6.0 + k2 / 3.0 + k3 / 3.0 + k4 / 6.0 # weighted avg of k1,2,3,4
 	r[:, i+1] = r[:, i] + k * dt # rk4: forward difference using combined slope k
 	return
+
+def jacobian(f: Callable[[np.ndarray, np.ndarray, int], None], jacob: np.ndarray, r: np.ndarray, delta: float, Nr: int) -> None:
+	f_r = np.ndarray(Nr)
+	print(f"f_r shape: {f_r.shape}")
+	f(f_r, r, Nr) # compute <f(<r>)>
+	f_perturbed = np.ndarray(Nr)
+	r_perturbed = r.copy() # shallow copy is enough for floats (immutable obj)
+	for i in range(0, Nr):
+		r_perturbed[i] += delta
+		f(f_perturbed, r_perturbed, Nr)
+		jacob[i] = (f_perturbed - f_r) / delta
+		print(f"jacob[{i}]= {jacob[i]}")
+		r_perturbed[i] -= delta # unperturb so only one var is perturbed at a time.
+
