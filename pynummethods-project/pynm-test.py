@@ -83,21 +83,18 @@ def jacobian_test():
 	print(f"r guess: {r_guess}")
 	delta = 0.01 # perturbation for forward difference
 	nm.jacobian(linsystems.NR_test_ls, jacob, r_guess, delta, Nr)
-	print(f"jacob: \n{jacob}")
-	# explicitly calculate jacobian
-	linsystems.NR_test_ls(f_r, r_guess, Nr) # calc f_1&2
-	r_perturbed[0] += delta
-	linsystems.NR_test_ls(f_perturbed, r_perturbed, Nr) # calc f_perturbed_0 1&2
-	r_perturbed[0] -= delta
-	jacob_expl[0] = (f_perturbed - f_r) / delta
-	r_perturbed[1] += delta
-	linsystems.NR_test_ls(f_perturbed, r_perturbed, Nr) # calc f_perturbed_1 1&2
-	r_perturbed[1] -= delta
-	jacob_expl[1] = (f_perturbed - f_r) / delta
-	print(f"jacob_expl: \n{jacob_expl}")
+	print(f"jacob[0]: {jacob[0][0]}, {jacob[0][1]}\njacob[1]: {jacob[1][0]}, {jacob[1][1]}\n")
+	print(f"jacob[0][:]: {jacob[0][:]}\njacob[1][:]: {jacob[1][:]}\n")
 
-	#df1dx = linsystems.NR_test_ls(f_r, )
-
+	# verified jacobian correctness
+	correct_jacob = np.array([[40.04, 26.0], [-0.50016456, -2.84136609]])
+	err_list = [] # changed from -1's to err location if calculation error found
+	for i in range(0, Nr):
+		for j in range(0, Nr):
+			if (abs(jacob[i][j] - correct_jacob[i][j]) > 1e-6):
+				err_list.append((i,j))
+	if (len(err_list) != 0):
+		print(f"ERROR: incorrect jacobian elements: {err_list}\n")
 
 
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
