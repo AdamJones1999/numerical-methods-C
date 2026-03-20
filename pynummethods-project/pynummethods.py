@@ -22,16 +22,17 @@ def rk4_single(drdt: Callable[[float, np.ndarray, int], np.ndarray], t: float, r
 	r[:, i+1] = r[:, i] + k * dt # rk4: forward difference using combined slope k
 	return
 
+# compute jacobian of vector valued multivariable function <f(<r>)>
+# result is written to 'jacob' an NrxNr matrix
 def jacobian(f: Callable[[np.ndarray, np.ndarray, int], None], jacob: np.ndarray, r: np.ndarray, delta: float, Nr: int) -> None:
 	f_r = np.ndarray(Nr)
-	print(f"f_r shape: {f_r.shape}")
 	f(f_r, r, Nr) # compute <f(<r>)>
 	f_perturbed = np.ndarray(Nr)
 	r_perturbed = r.copy() # shallow copy is enough for floats (immutable obj)
+	# compute one column of jacobian per loop iter
 	for i in range(0, Nr):
 		r_perturbed[i] += delta
 		f(f_perturbed, r_perturbed, Nr)
-		jacob[i] = (f_perturbed - f_r) / delta
-		print(f"jacob[{i}]= {jacob[i]}")
+		jacob[:, i] = (f_perturbed - f_r) / delta
 		r_perturbed[i] -= delta # unperturb so only one var is perturbed at a time.
 
