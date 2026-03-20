@@ -75,18 +75,17 @@ def jacobian_test():
 	Nr = 2
 	jacob = np.ndarray((Nr, Nr))
 	jacob_expl = np.ndarray((Nr, Nr))
-	r_guess = np.array([5.0, 4.0], dtype=float) # initial guess
+	r0 = np.array([5.0, 4.0], dtype=float) # initial guess
 	f_r = np.ndarray((2,))
 	f_perturbed = np.ndarray((2,))
-	r_perturbed = r_guess.copy() # shallow copy is enough for floats (immutable obj)
+	r_perturbed = r0.copy() # shallow copy is enough for floats (immutable obj)
 	
-	print(f"r guess: {r_guess}")
+	print(f"initial root vector <r> guess: {r0}")
 	delta = 0.01 # perturbation for forward difference
-	nm.jacobian(linsystems.NR_test_ls, jacob, r_guess, delta, Nr)
-	print(f"jacob[0]: {jacob[0][0]}, {jacob[0][1]}\njacob[1]: {jacob[1][0]}, {jacob[1][1]}\n")
-	print(f"jacob[0][:]: {jacob[0][:]}\njacob[1][:]: {jacob[1][:]}\n")
+	nm.jacobian(linsystems.NR_test_ls, jacob, r0, delta, Nr)
 
-	# verified jacobian correctness
+	# verifyinng jacobian correctness
+	print(f"calculated jacobian:\n{jacob}")
 	correct_jacob = np.array([[40.04, 26.0], [-0.50016456, -2.84136609]])
 	err_list = [] # changed from -1's to err location if calculation error found
 	for i in range(0, Nr):
