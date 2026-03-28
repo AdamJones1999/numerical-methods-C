@@ -75,7 +75,7 @@ def jacobian_test():
 	Nr = 2
 	jacob = np.ndarray((Nr, Nr))
 	jacob_expl = np.ndarray((Nr, Nr))
-	r0 = np.array([5.0, 4.0], dtype=float) # initial guess
+	r0 = np.array([5.0, 4.0], dtype=float)
 	f_r = np.ndarray((2,))
 	f_perturbed = np.ndarray((2,))
 	r_perturbed = r0.copy() # shallow copy is enough for floats (immutable obj)
@@ -95,6 +95,17 @@ def jacobian_test():
 	if (len(err_list) != 0):
 		print(f"ERROR: incorrect jacobian elements: {err_list}\n")
 
+
+def newton_rhapson_test():
+	Nr = 2
+	r0 = np.array([5.0, 4.0], dtype=float)
+	target = 1e-4
+	f_r = np.ndarray((Nr,))
+	r_solved = nm.newton_rhapson(linsystems.NR_test_ls, r0, target, Nr)
+	# verify found roots are correct
+	linsystems.NR_test_ls(f_r,r_solved, Nr)
+	for i in range(0, Nr):
+		print(f"r_solved=[{i}] = {r_solved[i]}\nf_r_solved[{i}] = {f_r[i]}")
 
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	# ---------- analytical solution to y'' + 16y = 0 ----------
@@ -204,4 +215,6 @@ if __name__=="__main__":
 	# non_linear_osc_rk4_plot(t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1)
 
 	# jacobian test
-	jacobian_test()
+
+	# newton rhapson test
+	newton_rhapson_test()
