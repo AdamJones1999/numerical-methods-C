@@ -52,3 +52,26 @@ def rossler(t: float, rcol: np.ndarray, Nr: int) -> np.ndarray:
 		drdt[1] = x + a*y
 		drdt[2] = b + z*x - c*z
 		return drdt
+
+
+"""
+1D time independent shrodinger equation
+x: independent variable
+rcol: psi and phi (d(psi)dx)
+Nr: number of vars in rcol
+"""
+def Schrodinger1DFixedE(x, rcol, Nr):
+	Nr_req = 2
+	if (Nr != Nr_req):
+		raise Exception(Nvars_err_msg("rossler", Nr, Nr_req))
+	else:
+		drdt = np.zeros((Nr), dtype=float)
+		h_bar = 6.582e-16 # [eV*s] reduced planck constant
+		m = 0.511e-6 / (3e8) ** 2 # [eV/(m/s)^2]
+		V = 0 # potential
+		E = 11e3 # [eV] particle kinetic energy
+		drdt[0] = rcol[1]
+		drdt[1] = -2 * m/h_bar**2 * (V - E) * rcol[0]
+		return drdt
+
+
