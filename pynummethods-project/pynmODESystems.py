@@ -118,12 +118,9 @@ def Schrodinger1D_boundary_val(r_last: np.ndarray, E: np.ndarray, Nr: int):
 		r = np.zeros((Nr+2, Nx), dtype=float)
 		r0 = [0, 1e-3, E[0]]
 		r[:, 0] = r0
-		target = 1e-4 # required accuracy of boundary condition at L
-		r_found = 1
+		# propagating solution attempt using rk4
 		for i in range(0, Nx-1):
 			nm.rk4_single(Schrodinger1DVariableE, x[i], r, i, dx, Nr+2)
 		r_last[0] = r[0, Nx-1]
-
-		plt.show()
 		return
 

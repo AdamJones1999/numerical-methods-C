@@ -57,7 +57,7 @@ def newton_rhapson(f: Callable[[np.ndarray, np.ndarray, int], None], r0: np.ndar
 	jacob = np.ndarray((Nr, Nr), dtype=np.float64)
 	r_converged = np.ndarray((Nr,), dtype=np.float64)
 	r_guess = r0.copy() # initial NR guess
-	perturb = target * 1e4 # jacobian dep var step
+	perturb = target * 1e2 # jacobian dep var step
 	converged = False # flag of if all root vector elements converge (change less than 'target')
 	n_iters = 0 # performance tracking
 	while (not converged):
