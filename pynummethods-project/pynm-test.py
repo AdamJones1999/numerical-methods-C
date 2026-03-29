@@ -123,11 +123,11 @@ def Schrodinger1DFixedE_test():
 		nm.rk4_single(odes.Schrodinger1DFixedE, x[i], r, i, dx, Nr)
 	return x, r, dx, Nx
 
-def Schrodinger1D_boundary_val_test():
+def Schrodinger1D_boundary_val_test(E0_guess):
 	pass
 	Nr = 1
-	E0 = np.array([4e3], dtype=np.float64) # [eV] initial guess for energy level
-	target = 1e-12
+	E0 = np.array([E0_guess], dtype=np.float64) # [eV] initial guess for energy level
+	target = 1e-10
 	E_solved = nm.newton_rhapson(odes.Schrodinger1D_boundary_val, E0, target, Nr)
 	print(f"E_solved= = {E_solved[0]}\n")
 
@@ -258,5 +258,8 @@ if __name__=="__main__":
 	# x, r, dx, Nx = Schrodinger1DFixedE_test()
 	# Schrodinger1DFixedE_plot(x, r, dx, Nx)
 	# Schrodinger1D_boundary_val test
-	Schrodinger1D_boundary_val_test()
+	Schrodinger1D_boundary_val_test(4e3) # energy level n=1
+	Schrodinger1D_boundary_val_test(16e3) # energy level n=2
+	Schrodinger1D_boundary_val_test(34e3) # energy level n=3
+	Schrodinger1D_boundary_val_test(60e3) # energy level n=4
 	print("finito")
