@@ -123,6 +123,13 @@ def Schrodinger1DFixedE_test():
 		nm.rk4_single(odes.Schrodinger1DFixedE, x[i], r, i, dx, Nr)
 	return x, r, dx, Nx
 
+def Schrodinger1D_boundary_val_test():
+	pass
+	Nr = 1
+	E0 = np.array([4e3], dtype=np.float64) # [eV] initial guess for energy level
+	target = 1e-12
+	E_solved = nm.newton_rhapson(odes.Schrodinger1D_boundary_val, E0, target, Nr)
+	print(f"E_solved= = {E_solved[0]}\n")
 
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	# ---------- analytical solution to y'' + 16y = 0 ----------
@@ -247,10 +254,9 @@ if __name__=="__main__":
 	# newton rhapson test
 	# newton_rhapson_test()
 
-	# Schrodinger1D time indep FixedE test
-	x, r, dx, Nx = Schrodinger1DFixedE_test()
-	Schrodinger1DFixedE_plot(x, r, dx, Nx)
-	
-	# Schrodinger1D time indep boundary_val test
-	# Schrodinger1D_boundary_val_test()
+	# Schrodinger1DFixedE test
+	# x, r, dx, Nx = Schrodinger1DFixedE_test()
+	# Schrodinger1DFixedE_plot(x, r, dx, Nx)
+	# Schrodinger1D_boundary_val test
+	Schrodinger1D_boundary_val_test()
 	print("finito")
