@@ -76,7 +76,6 @@ def Schrodinger1DFixedE(x, rcol, Nr):
 		drdt[1] = 2 * m/h_bar**2 * (V - E) * rcol[0]
 		return drdt
 
-
 """
 1D time independent shrodinger equation with E as an element in rcol.
 ONLY to be used within Schrodinger1D_boundary_val
@@ -85,7 +84,19 @@ rcol: [0]: psi, [1]: phi (d(psi)dx), [2]: Kinetic energy
 Nr: number of vars in rcol
 """
 def Schrodinger1DVariableE(x, rcol, Nr):
-	pass
+	Nr_req = 3
+	if (Nr != Nr_req):
+		raise Exception(Nvars_err_msg("Schrodinger1DVariableE", Nr, Nr_req))
+	else:
+		drdt = np.zeros((Nr), dtype=float)
+		h_bar = 6.582119569e-16 # [eV*s] reduced planck constant
+		m = 0.51099895069e6 / (2.99792458e8) ** 2 # [eV/(m/s)^2]
+		V = 0 # potential
+		E = rcol[2]
+		drdt[0] = rcol[1]
+		drdt[1] = 2 * m/h_bar**2 * (V - E) * rcol[0]
+		drdt[2] = 0
+		return drdt
 
 """
 r_last: the last element of the rk4 propagation
@@ -93,5 +104,26 @@ E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
 Nr: number of variables that should be 1 because we are concerned with just the initial energy
 """
 def Schrodinger1D_boundary_val(r_last: np.ndarray, E: np.ndarray, Nr: int):
-	pass
+	Nr_req = 1
+	if (Nr != Nr_req):
+		raise Exception(Nvars_err_msg("Schrodinger1D_boundary_val", Nr, Nr_req))
+	else:
+		# initialization for rk4
+		x0 = 0
+		dx = 1e-14
+		xf = 1e-11 # length of potential well L
+		Nx = int(np.floor(1000*(xf-x0)/(1000*dx))) # Nx=1000 without scale up (too small numbers)
+		# print(f"Nx: {Nx}")
+		x = np.linspace(x0, xf, num=Nx, endpoint=False, dtype=float)
+		r = np.zeros((Nr+2, Nx), dtype=float)
+		r0 = [0, 1e-3, E[0]]
+		r[:, 0] = r0
+		target = 1e-4 # required accuracy of boundary condition at L
+		r_found = 1
+		for i in range(0, Nx-1):
+			nm.rk4_single(Schrodinger1DVariableE, x[i], r, i, dx, Nr+2)
+		r_last[0] = r[0, Nx-1]
+
+		plt.show()
+		return
 
