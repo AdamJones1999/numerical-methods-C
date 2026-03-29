@@ -5,6 +5,8 @@ They are to be used within numerical methods defined in pynummethods.py
 """
 
 import numpy as np
+import pynummethods as nm
+from matplotlib import pyplot  as plt
 
 def Nvars_err_msg(f_name: str, Nvars: int, Nvars_req: int) -> str:
 	return f"{f_name} requires {Nvars_req} dep vars. Provided {Nvars}"
@@ -63,15 +65,33 @@ Nr: number of vars in rcol
 def Schrodinger1DFixedE(x, rcol, Nr):
 	Nr_req = 2
 	if (Nr != Nr_req):
-		raise Exception(Nvars_err_msg("rossler", Nr, Nr_req))
+		raise Exception(Nvars_err_msg("Schrodinger1DFixedE", Nr, Nr_req))
 	else:
 		drdt = np.zeros((Nr), dtype=float)
 		h_bar = 6.582e-16 # [eV*s] reduced planck constant
-		m = 0.511e-6 / (3e8) ** 2 # [eV/(m/s)^2]
+		m = 0.511e6 / (3e8) ** 2 # [eV/(m/s)^2]
 		V = 0 # potential
-		E = 11e3 # [eV] particle kinetic energy
+		E = 17e3 # [eV] particle kinetic energy
 		drdt[0] = rcol[1]
-		drdt[1] = -2 * m/h_bar**2 * (V - E) * rcol[0]
+		drdt[1] = 2 * m/h_bar**2 * (V - E) * rcol[0]
 		return drdt
 
+
+"""
+1D time independent shrodinger equation with E as an element in rcol.
+ONLY to be used within Schrodinger1D_boundary_val
+x: independent variable
+rcol: [0]: psi, [1]: phi (d(psi)dx), [2]: Kinetic energy 
+Nr: number of vars in rcol
+"""
+def Schrodinger1DVariableE(x, rcol, Nr):
+	pass
+
+"""
+r_last: the last element of the rk4 propagation
+E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
+Nr: number of variables that should be 1 because we are concerned with just the initial energy
+"""
+def Schrodinger1D_boundary_val(r_last: np.ndarray, E: np.ndarray, Nr: int):
+	pass
 
