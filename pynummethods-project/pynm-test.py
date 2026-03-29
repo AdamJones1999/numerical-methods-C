@@ -107,6 +107,23 @@ def newton_rhapson_test():
 	for i in range(0, Nr):
 		print(f"r_solved=[{i}] = {r_solved[i]}\nf_r_solved[{i}] = {f_r[i]}")
 
+
+def Schrodinger1DFixedE_test():
+	x0 = 0
+	dx = 1e-14
+	xf = 1e-11 # length of potential well
+	Nx = int(np.floor(1000*(xf-x0)/(1000*dx))) # Nx=1000 without scale up (too small numbers)
+	print(f"Nx: {Nx}")
+	Nr = 2
+	x = np.linspace(x0, xf, num=Nx, endpoint=False, dtype=float)
+	r = np.zeros((Nr, Nx), dtype=float)
+	r0 = [0, 1e-3]
+	r[:, 0] = r0
+	for i in range(0, Nx-1):
+		nm.rk4_single(odes.Schrodinger1DFixedE, x[i], r, i, dx, Nr)
+	return x, r, dx, Nx
+
+
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
 	# ---------- analytical solution to y'' + 16y = 0 ----------
 	x_shm_analytical = np.cos(4*t_e1) + 0.25*np.sin(4*t_e1)
@@ -199,6 +216,17 @@ def non_linear_osc_rk4_plot(t, r, dt, Nt):
 	plt.show()
 
 
+def Schrodinger1DFixedE_plot(x, r, dx, Nx):
+	plt.figure(figsize=(16, 8))
+	plt.tight_layout()
+	plt.subplot(1, 1, 1)
+	plt.plot(x, r[0, :])
+	plt.title(f"1D time indep schrod psi(x) vs x using rk4 over 0 to L x=[{x[0]}, {x[Nx-1]}], dx={dx}")
+	plt.xlabel("x")
+	plt.ylabel("psi(x)")
+
+	plt.show()
+
 if __name__=="__main__":
 	'''
 	# simple harmonic oscillator ODE test
@@ -217,4 +245,12 @@ if __name__=="__main__":
 	# jacobian test
 
 	# newton rhapson test
-	newton_rhapson_test()
+	# newton_rhapson_test()
+
+	# Schrodinger1D time indep FixedE test
+	x, r, dx, Nx = Schrodinger1DFixedE_test()
+	Schrodinger1DFixedE_plot(x, r, dx, Nx)
+	
+	# Schrodinger1D time indep boundary_val test
+	# Schrodinger1D_boundary_val_test()
+	print("finito")
