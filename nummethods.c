@@ -185,20 +185,19 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 }
 
 
-double **jacobian(void (*f)(double *, double *, uint), double r[], double **jacob_mat, \
+double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
 	double perturb, uint Nr) {
 	double *f_r = malloc(Nr * sizeof(double));
 	double *f_perturbed = malloc(Nr * sizeof(double));
 	double *r_perturbed = malloc(Nr * sizeof(double));
 	memcpy(r_perturbed, r, (size_t) Nr * sizeof(double));
 	f(f_r, r, Nr);
-	uint j;
-	uint i;
+	uint j; uint i;
 	for (j = 0; j < Nr; j++) {
 		r_perturbed[j] += perturb; // perturb a single variable
 		f(f_perturbed, r_perturbed, Nr);
 		for (i = 0; i < Nr; i++) {
-			jacob_mat[i][j] = (f_perturbed[i] - f_r[i]);
+			jacob_mat[i][j] = (f_perturbed[i] - f_r[i]) / perturb;
 		}
 		r_perturbed[j] -= perturb;
 	}
