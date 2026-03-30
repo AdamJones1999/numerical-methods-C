@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <nummethods.h>
+#include <string.h>
 
 // allocates one block of memory for array data and then a 
 // vector of row pointers.
@@ -184,9 +185,23 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 }
 
 
-double **jacobian(void (*f)(double *, double *, uint), double x[], double **jacob_mat, double delta, uint Nr) {
-	(void) f; (void) x; (void) delta; (void) Nr;
-	// use memcpy to get x[] + delta from x[]
+double **jacobian(void (*f)(double *, double *, uint), double r[], double **jacob_mat, \
+	double perturb, uint Nr) {
+	double *f_r = malloc(Nr * sizeof(double));
+	double *f_perturbed = malloc(Nr * sizeof(double));
+	double *r_perturbed = malloc(Nr * sizeof(double));
+	memcpy(r_perturbed, r, (size_t) Nr * sizeof(double));
+	f(f_r, r, Nr);
+	uint j;
+	uint i;
+	for (j = 0; j < Nr; j++) {
+		r_perturbed[j] += perturb; // perturb a single variable
+		f(f_perturbed, r_perturbed, Nr);
+		for (i = 0; i < Nr; i++) {
+			jacob_mat[i][j] = (f_perturbed[i] - f_r[i]);
+		}
+		r_perturbed[j] -= perturb;
+	}
 	return jacob_mat;
 }
 

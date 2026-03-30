@@ -74,14 +74,13 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
 
 
-double **jacobian(void (*f)(double *, double *, uint), double x[], double **jacob_mat, \
-	double delta, uint Nr);
+double **jacobian(void (*f)(double *, double *, uint), double r[], double **jacob_mat, \
+	double perturb, uint Nr);
 
 /*
 @description:
 	currently only single var!!
-	writes 1D array data (2D support coming soon) to a 
-little endian binary file.
+	writes 1D array data (2D support coming soon) to a little endian binary file.
 
 @params:
 	data: pointer to data array.
