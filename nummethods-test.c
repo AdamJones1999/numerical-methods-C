@@ -4,6 +4,7 @@
 #include <math.h>
 #include <nummethods.h>
 #include <odesystems.h>
+#include <linearsystems.h>
 
 
 int malloc_2d_array_tests() {
@@ -462,6 +463,34 @@ int rk4_orbitalburn_test() {
 }
 
 
+int jacobian_test() {
+	uint Nr = 2;
+	double **jacob = alloc_2d_array(Nr, Nr);
+	double correct_jacob[2][2] = {{40.04, 26.0}, {-0.50016456, -2.84136609}};
+	double r0[2] = {5.0, 4.0};
+	
+	printf("initial root vector <r> guess r0: [%f, %f]\n", r0[0], r0[1]);
+	double perturb = 0.01; // perturbation for forward difference;
+	jacobian(NR_test_ls, jacob, r0, perturb, Nr);
+
+	// verifyinng jacobian correctness
+	printf("calculated jacobian:\n[ %f, %f;\n%f, %f ]\n", jacob[0][0], jacob[0][1], jacob[1][0], jacob[1][1]);
+	printf("correct jacobian:\n[ %f, %f;\n%f, %f ]\n", correct_jacob[0][0], correct_jacob[0][1], correct_jacob[1][0], correct_jacob[1][1]);
+
+	uint i; uint j;
+	for (i = 0; i < Nr; i++) {
+		for (j = 0; j < Nr; j++) {
+			if (fabs(jacob[i][j] - correct_jacob[i][j]) > 1e-6) {
+				printf("incorrect jacobian element at el [%d][%d]: %f\n", i, j, jacob[i][j]);
+				return -1;
+			}
+		}
+	}
+	printf("JACOBIAN PASSED\n");
+	return 0;
+}
+
+
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
@@ -489,6 +518,7 @@ int main() {
 	run_test(rk4_test, "rk4 prelim test");
 	run_test(rk4_orbitalmotion_test, "rk4 hohmann ordbitalmotion model test");
 	run_test(rk4_orbitalburn_test, "rk4 hohmann ordbitalburn model test");
+	run_test(jacobian_test, "jacobian test on system of two non-linear equations of 2 variables");
 	// //////////////// END TESING ////////////////
 	return 0;
 }
