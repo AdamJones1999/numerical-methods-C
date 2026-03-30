@@ -24,20 +24,25 @@ all: make-dir $(TARGET)
 make-dir:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR) $(DATA_DIR)
 
-OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o $(OBJ_DIR)/odesystems.o
+OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o $(OBJ_DIR)/odesystems.o $(OBJ_DIR)/linearsystems.o
 
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LFLAGS)
 
 $(OBJ_DIR)/nummethods-test.o: $(SRC_DIR)/nummethods-test.c \
 $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h \
-$(SRC_DIR)/odesystems.c $(SRC_DIR)/odesystems.h
+$(SRC_DIR)/odesystems.c $(SRC_DIR)/odesystems.h \
+$(SRC_DIR)/linearsystems.c $(SRC_DIR)/linearsystems.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods-test.c \
 -o $(OBJ_DIR)/nummethods-test.o $(INCLUDE_DIRS)
 
 $(OBJ_DIR)/odesystems.o: $(SRC_DIR)/odesystems.c $(SRC_DIR)/odesystems.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/odesystems.c \
 -o $(OBJ_DIR)/odesystems.o $(INCLUDE_DIRS)
+
+$(OBJ_DIR)/linearsystems.o: $(SRC_DIR)/linearsystems.c $(SRC_DIR)/linearsystems.h
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/linearsystems.c \
+-o $(OBJ_DIR)/linearsystems.o $(INCLUDE_DIRS)
 
 $(OBJ_DIR)/nummethods.o: $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC_DIR)/nummethods.c \
