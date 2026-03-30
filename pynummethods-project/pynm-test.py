@@ -123,12 +123,15 @@ def Schrodinger1DFixedE_test():
 		nm.rk4_single(odes.Schrodinger1DFixedE, x[i], r, i, dx, Nr)
 	return x, r, dx, Nx
 
-def Schrodinger1D_boundary_val_test(E0_guess):
+def Schrodinger1D_boundary_val_test(E0_guess, E0_correct):
 	pass
 	Nr = 1
 	E0 = np.array([E0_guess], dtype=np.float64) # [eV] initial guess for energy level
 	target = 1e-10
 	E_solved = nm.newton_rhapson(odes.Schrodinger1D_boundary_val, E0, target, Nr)
+	err = abs(E_solved[0] / E0_correct - 1)
+	if (err > 0.002):
+		print(f"ERROR: numerical solution to energy level E: {E_solved[0]} is {err} off of correct E: {E0_correct}")
 	print(f"E_solved= = {E_solved[0]}\n")
 
 def shm_euler_midpoint_plot(t_e1, r_e1, dt_e1, Nt_e1, t_m1, r_m1, dt_m1, Nt_m1):
@@ -250,6 +253,7 @@ if __name__=="__main__":
 	# non_linear_osc_rk4_plot(t_rk4_1, r_rk4_1, dt_rk4_1, Nt_rk4_1)
 
 	# jacobian test
+	jacobian_test()
 
 	# newton rhapson test
 	# newton_rhapson_test()
@@ -258,8 +262,8 @@ if __name__=="__main__":
 	# x, r, dx, Nx = Schrodinger1DFixedE_test()
 	# Schrodinger1DFixedE_plot(x, r, dx, Nx)
 	# Schrodinger1D_boundary_val test
-	Schrodinger1D_boundary_val_test(4e3) # energy level n=1
-	Schrodinger1D_boundary_val_test(16e3) # energy level n=2
-	Schrodinger1D_boundary_val_test(34e3) # energy level n=3
-	Schrodinger1D_boundary_val_test(60e3) # energy level n=4
+	Schrodinger1D_boundary_val_test(4e3, 3760.30162) # energy level n=1
+	Schrodinger1D_boundary_val_test(16e3, 15041.2065) # energy level n=2
+	Schrodinger1D_boundary_val_test(34e3, 33842.7146) # energy level n=3
+	Schrodinger1D_boundary_val_test(60e3, 60164.8259) # energy level n=4
 	print("finito")
