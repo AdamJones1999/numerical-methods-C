@@ -74,11 +74,7 @@ def non_linear_osc_rk4_test() -> Tuple[np.ndarray, np.ndarray, float, int]:
 def jacobian_test():
 	Nr = 2
 	jacob = np.ndarray((Nr, Nr))
-	jacob_expl = np.ndarray((Nr, Nr))
 	r0 = np.array([5.0, 4.0], dtype=float)
-	f_r = np.ndarray((2,))
-	f_perturbed = np.ndarray((2,))
-	r_perturbed = r0.copy() # shallow copy is enough for floats (immutable obj)
 	
 	print(f"initial root vector <r> guess: {r0}")
 	delta = 0.01 # perturbation for forward difference
