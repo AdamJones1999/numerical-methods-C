@@ -6,6 +6,7 @@
 #include <odesystems.h>
 #include <linearsystems.h>
 #include <cblas.h>
+#include <lapacke.h>
 
 
 int malloc_2d_array_tests() {
@@ -503,6 +504,23 @@ int cblas_dnrm2_test() {
 	return 0;
 }
 
+int lapacke_dgesv_test() {
+	int n = 4;
+	double A[16] = {4.0, 5.0, -2.0, 2.0, -1.0, -4.0, 6.0, 3.0, -5.0, 8.0, -6.0, 8.0, 1.0, 2.0, 3.0, 4.0};
+	double b[4] = {6.0, 1.0, 5.0, 1.0}; //overwritten by solution
+	double b_correct[4] = {1.857143, -2.000000, -2.000000, 2.285714};
+	//double *x = malloc(n * sizeof(double));
+	//lapack_int *iter;
+	lapack_int *ipiv = malloc(n * sizeof(lapack_int));
+	lapack_int info; // return value
+	info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, 1, A, n, ipiv, b, 1);
+
+	printf("info: %d\n", info);
+	printf("calculated solution: [%f, %f, %f, %f]\n", b[0], b[1], b[2], b[3]);
+	printf("correct solution:    [%f, %f, %f, %f]\n", b_correct[0], b_correct[1], b_correct[2], b_correct[3]);
+	return 0;
+}
+
 
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
@@ -533,6 +551,7 @@ int main() {
 	run_test(rk4_orbitalburn_test, "rk4 hohmann ordbitalburn model test");
 	run_test(jacobian_test, "jacobian test on system of two non-linear equations of 2 variables");
 	run_test(cblas_dnrm2_test, "testing if I installed cblas library properly");
+	run_test(lapacke_dgesv_test, "see if I can use LAPACKE_dgesv() properly");
 	// //////////////// END TESING ////////////////
 	
 	return 0;
