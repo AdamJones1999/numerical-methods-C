@@ -5,6 +5,7 @@
 #include <nummethods.h>
 #include <odesystems.h>
 #include <linearsystems.h>
+#include <cblas.h>
 
 
 int malloc_2d_array_tests() {
@@ -490,6 +491,18 @@ int jacobian_test() {
 	return 0;
 }
 
+int cblas_dnrm2_test() {
+	double v[] = {5.0,12.0};
+	double norm = cblas_dnrm2(2, v, 1);
+	double correct_norm = sqrt(5.0*5.0 + 12.0*12.0);
+	if (norm - correct_norm > 1e-8) {
+		printf("norm is %f, should be %f\n", norm, correct_norm);
+		return -1;
+	}
+	printf("norm is %f, should be %f\n", norm, correct_norm);
+	return 0;
+}
+
 
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
@@ -519,6 +532,8 @@ int main() {
 	run_test(rk4_orbitalmotion_test, "rk4 hohmann ordbitalmotion model test");
 	run_test(rk4_orbitalburn_test, "rk4 hohmann ordbitalburn model test");
 	run_test(jacobian_test, "jacobian test on system of two non-linear equations of 2 variables");
+	run_test(cblas_dnrm2_test, "testing if I installed cblas library properly");
 	// //////////////// END TESING ////////////////
+	
 	return 0;
 }
