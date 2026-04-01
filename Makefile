@@ -2,15 +2,16 @@
 
 CC = gcc # c compiler used
 CFLAGS = -g # compiler flags (-g: enable debugging)
-LIBS = -lm # syntax: -l<lib_name> (omit <>)
-LIB_DIRS = # syntax: -L<dir> (omit <>)
+LIBS = -lm -lopenblas -llapacke # syntax: -l<lib_name> (omit <>) tells which libraries to include
+LIB_SEARCH_DIRS = #syntax: -L<dir> (omit <>) tells which directories to SEARCH for libraries. There are some default ones like /lib
+
 CPPFLAGS = -O2 -Wall -Wextra -pedantic
 
-LFLAGS = $(LIBS) $(LIB_DIRS) # linker flags
+LFLAGS = $(LIBS) $(LIB_SEARCH_DIRS) # linker flags
 # directories to search for header files, libraries, 
 # and parts of compiler. All during preprocessing.
 # makes nummethods.h, etc. considered system headers by compiler.
-INCLUDE_DIRS = -I. 
+INCLUDE_DIRS = -I. # additional direectories to look for header files in.
 SRC_DIR = .
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj
@@ -29,7 +30,8 @@ OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o $(OBJ_DIR)/odesystem
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LFLAGS)
 
-$(OBJ_DIR)/nummethods-test.o: $(SRC_DIR)/nummethods-test.c \
+$(OBJ_DIR)/nummethods-test.o: \
+$(SRC_DIR)/nummethods-test.c \
 $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h \
 $(SRC_DIR)/odesystems.c $(SRC_DIR)/odesystems.h \
 $(SRC_DIR)/linearsystems.c $(SRC_DIR)/linearsystems.h
