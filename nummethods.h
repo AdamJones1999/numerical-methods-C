@@ -77,6 +77,10 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
 	double perturb, uint Nr);
 
+
+double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double target, uint Nr);
+
+
 /*
 @description:
 	currently only single var!!

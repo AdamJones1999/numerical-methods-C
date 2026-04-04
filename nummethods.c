@@ -205,6 +205,38 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 }
 
 
+double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double target, uint Nr) {
+	double *f_r = (double *) malloc(Nr * sizeof(double));
+	double **jacob = (double **) alloc_2d_array(Nr, Nr); // jacobian
+	double perturb = target * 1.0e2; // jacobian fwd diff step and perturbation of each variable in jacobian.
+	double *r_guess = (double *) malloc(Nr * sizeof(double));
+	double *dr = (double *) malloc(Nr * sizeof(double));
+	memcpy(r_guess, r0, (size_t) Nr * sizeof(double));
+	double max_err = target + 1.0; // highest error of all roots. starts higher than target so while loop is entered.
+	uint i = 0;
+	// while (error > target) {
+	while (max_err > target) {
+		f(f_r, r_guess, Nr); // compute <f(<r>)>
+		jacobian(f, jacob, r_guess, perturb, Nr); // compute jacobian
+		//  dr = linsolve(jacob, f_r) LAPACKE LINSOLVE HERE
+		// find max error in all roots
+		for (i = 0; i < Nr; i++) {
+			if (dr[i] > max_err) {
+				max_err = dr[i];
+			}
+		}
+		// create new guesses for next iteration.
+		for (i = 0; i < Nr; i++) {
+			r_guess[i] = r_guess[i] - dr[i];
+		}
+	}
+	/*
+	info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, 1, A, n, ipiv, b, 1);
+	*/
+	return r_guess;
+}
+
+
 int to_bin(double *data, uint N, uint dims, char fname[], char mode[]) {
 	FILE *fp;
 	if ((fp = fopen(fname, mode)) == NULL) {
