@@ -97,6 +97,10 @@ double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 		k_weighted[i] = k1[i] / 6.0 + k2[i] / 3.0 + k3[i] / 3.0 + k4[i] / 6.0;
 		r[i][j_r + 1] = r[i][j_r] + k_weighted[i] * dt;
 	}
+
+	free(r_curr);
+	free_2d_array((void **) k);
+	free_2d_array((void **) r_k);
 	/*
 	uint j;
 	double *row_ptr;
@@ -204,6 +208,10 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 		}
 		r_perturbed[j] -= perturb;
 	}
+
+	free(f_r);
+	free(f_perturbed);
+	free(r_perturbed);
 	return jacob_mat;
 }
 
@@ -213,9 +221,9 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 		printf("ERROR in newton_rhapson() arg: 'target' must be > 0\n");
 		return NULL;
 	}
+	double perturb = target * 1.0e2; // jacobian fwd diff step and perturbation of each variable in jacobian.
 	double *f_r = (double *) malloc(Nr * sizeof(double));
 	double **jacob = (double **) alloc_2d_array(Nr, Nr); // jacobian
-	double perturb = target * 1.0e2; // jacobian fwd diff step and perturbation of each variable in jacobian.
 	double *r_guess = (double *) malloc(Nr * sizeof(double));
 	double *dr = (double *) malloc(Nr * sizeof(double));
 	int *ipiv = (int *) malloc(Nr * sizeof(double));
@@ -256,9 +264,10 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 			i += 1;
 		}
 	}
-	/*
-	info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, 1, A, n, ipiv, b, 1);
-	*/
+	free(f_r);
+	free_2d_array((void **) jacob);
+	free(dr);
+	free(ipiv);
 	return r_guess;
 }
 
