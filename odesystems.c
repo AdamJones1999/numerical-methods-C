@@ -72,3 +72,37 @@ void orbitalmotion(double drdt_t[], double r_t[], double t, uint Nr) {
 	drdt_t[5] = -mu * z / pow(r, 3) + T * vz / (m*v);
 	drdt_t[6] = -T / (g*Isp);
 }
+
+/*
+r_last: the last column of the rk4 propagation written to in place.
+E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
+Nr: number of variables that should be 1 because we are concerned with just the initial energy
+*/
+int Schrodinger1D_boundary_val(double r_last[], double *E, uint Nr) {
+	uint Nr_req = 1;
+	if (Nr != Nr_req) {
+		printf("ERROR in Schrodinger1D_boundary_val(): Nr must = 1\n");
+		return 1;
+	}
+	double x0 = 0;
+	double dx = 1e-13;
+	double xf = 1e-11;
+	uint Nx = (uint) floor((xf - x0) / dx);
+	double *x = (double *) malloc(Nx);
+	double **r = alloc_2d_array(Nr + 1, Nx);
+	// setting initial conditions
+	double r0[2] = {0, 1e-3};
+	r[0][0] = r0[0];
+	r[1][0] = r0[1];
+	// propagating solution attempt using rk4
+	uint i;
+	for (i = 0; i < Nx; i++) {
+		// rk4 call here
+		r[0][i] = *E * x[i]; // placeholder op to get to compile
+	}
+	for (i = 0; i < Nr; i++) {
+		// rk4 call here
+		r_last[i] = r[i][Nx - 1];
+	}
+	return 0;
+} 
