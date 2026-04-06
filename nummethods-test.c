@@ -522,6 +522,25 @@ int lapacke_dgesv_test() {
 }
 
 
+int newton_rhapson_test() {
+	uint Nr = 2;
+	double target = 1e-4;
+	double r0_guess[2] = {4.0, 5.0};
+	double *r0_solved = (double *) malloc(Nr * sizeof(double));
+	double r0_correct[2] = {0.4445, 0.1391};
+	r0_solved = newton_rhapson(NR_test_ls, r0_guess, target, Nr);
+	printf("r0 solved: \n[0]: %f\n[1]: %f\n", r0_solved[0], r0_solved[1]);
+	uint i;
+	for (i = 0; i < Nr; i++) {
+		if (r0_solved[i] - r0_correct[i] > target) {
+			printf("r[%d] error of %f is higher than target error of %f.\n", i, r0_solved[i], target);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
 void run_test(int (*test)(), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
@@ -552,6 +571,7 @@ int main() {
 	run_test(jacobian_test, "jacobian test on system of two non-linear equations of 2 variables");
 	run_test(cblas_dnrm2_test, "testing if I installed cblas library properly");
 	run_test(lapacke_dgesv_test, "see if I can use LAPACKE_dgesv() properly");
+	run_test(newton_rhapson_test, "Newton Rhapson method test on two equtn non-linear system.");
 	// //////////////// END TESING ////////////////
 	
 	return 0;
