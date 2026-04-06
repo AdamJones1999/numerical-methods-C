@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <nummethods.h>
 #include <string.h>
+#include <math.h>
+#include <nummethods.h>
+#include <cblas.h>
+#include <lapacke.h>
 
 // allocates one block of memory for array data and then a 
 // vector of row pointers.
@@ -206,28 +209,51 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 
 
 double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double target, uint Nr) {
+	if (target <= 0) {
+		printf("ERROR in newton_rhapson() arg: 'target' must be > 0\n");
+		return NULL;
+	}
 	double *f_r = (double *) malloc(Nr * sizeof(double));
 	double **jacob = (double **) alloc_2d_array(Nr, Nr); // jacobian
 	double perturb = target * 1.0e2; // jacobian fwd diff step and perturbation of each variable in jacobian.
 	double *r_guess = (double *) malloc(Nr * sizeof(double));
 	double *dr = (double *) malloc(Nr * sizeof(double));
+	int *ipiv = (int *) malloc(Nr * sizeof(double));
 	memcpy(r_guess, r0, (size_t) Nr * sizeof(double));
-	double max_err = target + 1.0; // highest error of all roots. starts higher than target so while loop is entered.
-	uint i = 0;
-	// while (error > target) {
-	while (max_err > target) {
+	// double max_err = target + 1.0; // highest error of all roots. starts higher than target so while loop is entered.
+	int info; // info for result of LAPACKE_dgesv
+	uint converged = 0; // convergence flag
+	uint i;
+	uint j;
+	/*
+	Keep solving del(<f>)*<dx> = <f(<r_guess>)> and keep iterating until every el of <dx> < target
+
+	NOTE: LAPACKE_dgesv overwrites <b> in <A>*<x>x = <b> with solution <x>. 
+	Thus the calculated <dx> difference between <r_guess> and the true <r> will be written 
+	into <f_r> each iteration.
+	*/
+	while (!converged) { // max_err > target
+		converged = 1;
 		f(f_r, r_guess, Nr); // compute <f(<r>)>
-		jacobian(f, jacob, r_guess, perturb, Nr); // compute jacobian
-		//  dr = linsolve(jacob, f_r) LAPACKE LINSOLVE HERE
-		// find max error in all roots
-		for (i = 0; i < Nr; i++) {
-			if (dr[i] > max_err) {
-				max_err = dr[i];
-			}
+		jacobian(f, jacob, r_guess, perturb, Nr); // compute jacobian J(<f(<r>)>)
+		info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, (int) Nr, 1, jacob[0], (int) Nr, ipiv, f_r, 1); // solve del(<f>)*<dx> = <f(<r_guess>)>
+		if (info < 0) {
+			printf("LAPACKE_dgesv failed. info=%d.\n", info);
 		}
-		// create new guesses for next iteration.
+		// for clarity while debugging. eventually dr[] can be eliminated and just use f_r[]
 		for (i = 0; i < Nr; i++) {
-			r_guess[i] = r_guess[i] - dr[i];
+			dr[i] = f_r[i];
+		}
+		i = 0;
+		// check if convergence is false in any of calculated roots.
+		while (converged && i < Nr) {
+			if (fabs(dr[i]) > target) { // if error is greater than target, calculate new <r_guess>
+				converged = 0;
+				for (j = 0; j < Nr; j++) {
+					r_guess[j] = r_guess[j] - dr[j];
+				}
+			}
+			i += 1;
 		}
 	}
 	/*
