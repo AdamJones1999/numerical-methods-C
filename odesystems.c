@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <nummethods.h>
 #include <math.h>
+#include <nummethods.h>
+#include <odesystems.h>
 
 void orbitalburn(double drdt_t[], double r_t[], double t, uint Nr) {
 	(void) t; // time independent
@@ -74,6 +75,30 @@ void orbitalmotion(double drdt_t[], double r_t[], double t, uint Nr) {
 }
 
 /*
+1D time independent shrodinger equation with E as an element in rcol.
+ONLY to be used within Schrodinger1D_boundary_val
+x: independent variable
+rcol: [0]: psi, [1]: phi (d(psi)dx), [2]: Kinetic energy 
+Nr: number of vars in rcol
+*/
+int Schrodinger1DVariableE(double drdx[], double x, double rcol[], uint Nr, void *params) {
+	(void) x; // V is in fact V(x) but V(x)=0 in whole well region 0<x<L.
+	uint Nr_req = 2;
+	if (Nr != Nr_req) {
+		printf("ERROR in (): Nr must be %d\n", Nr_req);
+		return 1;
+	}
+	double h_bar = 6.582119569e-16; // [eV*s] reduced qplanck constant
+	double m = 0.51099895069e6 / 8.9875517874e16; // [m_electron/c^2] = [eV/(m/s)^2]
+	double V = 0; // potential
+	double E = ((double *) params)[0]; // must know type of pointer before doing ptr arithmetic on it.
+	drdx[0] = rcol[1];
+	drdx[1] = 2 * m / pow(h_bar, 2) * (V - E) * rcol[0];
+	return 0;
+}
+
+
+/*
 r_last: the last column of the rk4 propagation written to in place.
 E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
 Nr: number of variables that should be 1 because we are concerned with just the initial energy
@@ -81,7 +106,7 @@ Nr: number of variables that should be 1 because we are concerned with just the 
 int Schrodinger1D_boundary_val(double r_last[], double *E, uint Nr) {
 	uint Nr_req = 1;
 	if (Nr != Nr_req) {
-		printf("ERROR in Schrodinger1D_boundary_val(): Nr must = 1\n");
+		printf("ERROR in Schrodinger1D_boundary_val(): Nr must = %d\n", Nr_req);
 		return 1;
 	}
 	double x0 = 0;
