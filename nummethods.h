@@ -69,6 +69,15 @@ double **euler_single(void (*drdt_f)(double *, double *, double, uint), \
 double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
 
+/*
+same as rk4 except an extra parameter array 'params' is passed to rk4_single_2() and 
+to the function drdt_f to allow for drdt_f to have modified parameters every iteration. 
+If drdt_f() does not use params, it can simply cast it to void.
+*/
+double **rk4_single_2(void (*drdt_f)(double *, double *, double, uint, void *), \
+	double t, double **r, uint j_r, double dt, uint Nr, void * params)
+
+
 //currently only single var tested
 double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 	double t, double **r, uint j_r, double dt, uint Nr);
