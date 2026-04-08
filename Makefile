@@ -5,7 +5,7 @@ CFLAGS = -g # compiler flags (-g: enable debugging)
 LIBS = -lm -lopenblas -llapacke # syntax: -l<lib_name> (omit <>) tells which libraries to include
 LIB_SEARCH_DIRS = #syntax: -L<dir> (omit <>) tells which directories to SEARCH for libraries. There are some default ones like /lib
 
-CPPFLAGS = -O2 -Wall -Wextra -pedantic
+CPPFLAGS = -O2 -Wall -Wextra -Wstrict-prototypes -pedantic 
 
 LFLAGS = $(LIBS) $(LIB_SEARCH_DIRS) # linker flags
 # directories to search for header files, libraries, 
