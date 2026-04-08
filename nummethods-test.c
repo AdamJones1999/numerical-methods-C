@@ -9,7 +9,7 @@
 #include <lapacke.h>
 
 
-int malloc_2d_array_tests() {
+int malloc_2d_array_tests(void) {
 	int pass = 0;
 	double el;
 	uint nrow = 5;
@@ -36,7 +36,7 @@ not a real test. I don't know how to test whether accessing a data has been
 actually freed or not without causing a segfault. There is a commented line in 
 this 'test' that will cause a segfault thus proving the memory has been freed
 */
-int free_2d_array_tests() {
+int free_2d_array_tests(void) {
 	uint nrow = 5;
 	uint ncol = 2;
 	double **arr = alloc_2d_array(nrow, ncol);
@@ -93,7 +93,7 @@ void shmODE_drdt(double drdt_t[], double r_t[], double t, uint Nr) {
 }
 
 // //////// test 1: simpleODE1 ////////  
-int euler_basic_ODE() {
+int euler_basic_ODE(void) {
 	char *fn = "data/test1.data";
 	uint N_t = 5;
 	uint Nr = 2; // num dependent variables
@@ -128,7 +128,7 @@ int euler_basic_ODE() {
 }
 
 // //////// test: simple harmonic motion using Euler Method (smhODE) ////////  
-int euler_shm() {
+int euler_shm(void) {
 	char *fn = "data/test2.data";
 	// initialize vars
 	uint NDIMS = 1;
@@ -171,7 +171,7 @@ int euler_shm() {
 }
 
 // //////// test: simple harmonic motion using Midpoint Method (smhODE) ////////  
-int midpoint_shm() {
+int midpoint_shm(void) {
 	char *fn = "data/test3.data";
 	uint NDIMS = 1;
 	uint N_t = 10000;
@@ -210,7 +210,7 @@ int midpoint_shm() {
 	}
 }
 
-int rk4_test() {
+int rk4_test(void) {
 	char *fn = "data/test4.data";
 	uint NDIMS = 1;
 	uint Nt = 10000;
@@ -271,7 +271,7 @@ int rk4_test() {
 origin of xyz coord system is center of the earth at equator.
 Earth is assumed to be a sphere.
 */
-int rk4_orbitalmotion_test() {
+int rk4_orbitalmotion_test(void) {
 	char *fn = "data/test5.data";
 	uint NDIMS = 1;
 	uint Nt = 100*60*100; // 100 minutes for dt = 0.01s
@@ -365,7 +365,7 @@ void ep428_lab2_q4d(double vx_end_burn, double vy_end_burn, double vz_end_burn, 
 }
 
 
-int rk4_orbitalburn_test() {
+int rk4_orbitalburn_test(void) {
 	char *fn = "data/test6.data";
 	uint NDIMS = 1;
 	double dt = 0.01; // [s]
@@ -465,7 +465,7 @@ int rk4_orbitalburn_test() {
 }
 
 
-int jacobian_test() {
+int jacobian_test(void) {
 	uint Nr = 2;
 	double **jacob = alloc_2d_array(Nr, Nr);
 	double correct_jacob[2][2] = {{40.04, 26.0}, {-0.50016456, -2.84136609}};
@@ -492,7 +492,7 @@ int jacobian_test() {
 	return 0;
 }
 
-int cblas_dnrm2_test() {
+int cblas_dnrm2_test(void) {
 	double v[] = {5.0,12.0};
 	double norm = cblas_dnrm2(2, v, 1);
 	double correct_norm = sqrt(5.0*5.0 + 12.0*12.0);
@@ -504,7 +504,7 @@ int cblas_dnrm2_test() {
 	return 0;
 }
 
-int lapacke_dgesv_test() {
+int lapacke_dgesv_test(void) {
 	int n = 4;
 	double A[16] = {4.0, 5.0, -2.0, 2.0, -1.0, -4.0, 6.0, 3.0, -5.0, 8.0, -6.0, 8.0, 1.0, 2.0, 3.0, 4.0};
 	double b[4] = {6.0, 1.0, 5.0, 1.0}; //overwritten by solution
@@ -522,7 +522,7 @@ int lapacke_dgesv_test() {
 }
 
 
-int newton_rhapson_test() {
+int newton_rhapson_test(void) {
 	uint Nr = 2;
 	double target = 1e-4;
 	double r0_guess[2] = {4.0, 5.0};
@@ -541,7 +541,7 @@ int newton_rhapson_test() {
 }
 
 
-void run_test(int (*test)(), char *test_name) {
+int run_test(int (*test)(void), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
 	if (result == -1) {
@@ -554,10 +554,10 @@ void run_test(int (*test)(), char *test_name) {
 		printf("test: %s returned undefined return code of %d \
 			(not 0 or -1)", test_name, result);
 	}
-	return;
+	return 0;
 }
 
-int main() {
+int main(void) {
 	// //////////////// START TESING ////////////////
 	
 	run_test(malloc_2d_array_tests, "writing then reading from 2d array with row ptrs");
