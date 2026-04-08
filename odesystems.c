@@ -81,53 +81,53 @@ x: independent variable
 rcol: [0]: psi, [1]: phi (d(psi)dx), [2]: Kinetic energy 
 Nr: number of vars in rcol
 */
-int Schrodinger1DVariableE(double drdx[], double x, double rcol[], uint Nr, void *params) {
+void Schrodinger1DVariableE(double drdx[], double rcol[], double x, uint Nr, void *E) {
 	(void) x; // V is in fact V(x) but V(x)=0 in whole well region 0<x<L.
 	uint Nr_req = 2;
 	if (Nr != Nr_req) {
-		printf("ERROR in (): Nr must be %d\n", Nr_req);
-		return 1;
+		printf("ERROR in Schrodinger1DVariableE(): Nr is %d, but must be %d\n", Nr, Nr_req);
+		exit(1);
 	}
 	double h_bar = 6.582119569e-16; // [eV*s] reduced qplanck constant
 	double m = 0.51099895069e6 / 8.9875517874e16; // [m_electron/c^2] = [eV/(m/s)^2]
 	double V = 0; // potential
-	double E = ((double *) params)[0]; // must know type of pointer before doing ptr arithmetic on it.
+	// double E = ((double *) E)[0]; // must know type of pointer before doing ptr arithmetic on it.
 	drdx[0] = rcol[1];
-	drdx[1] = 2 * m / pow(h_bar, 2) * (V - E) * rcol[0];
-	return 0;
+	drdx[1] = 2 * m / pow(h_bar, 2) * (V - ((double *) E)[0]) * rcol[0];
+	return;
 }
 
 
 /*
 r_last: the last column of the rk4 propagation written to in place.
-E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
+E: ptr to double containing only E: the kinetic energy guess [eV] for this iteration of newton rhaposn. 
 Nr: number of variables that should be 1 because we are concerned with just the initial energy
 */
-int Schrodinger1D_boundary_val(double r_last[], double *E, uint Nr) {
+void Schrodinger1D_boundary_val(double r_last[], double E[], uint Nr) {
 	uint Nr_req = 1;
 	if (Nr != Nr_req) {
 		printf("ERROR in Schrodinger1D_boundary_val(): Nr must = %d\n", Nr_req);
-		return 1;
+		exit(1);
 	}
 	double x0 = 0;
-	double dx = 1e-13;
+	double dx = 5e-17; // 5e-17 is lowest I could get with L = 1e-11 before i got a segfault after a few seconds (long time) from what I assume is a memory overrun caused by too many iterations due to some numerical precision issue involving dividing/multiplying by very small numbers.
 	double xf = 1e-11;
 	uint Nx = (uint) floor((xf - x0) / dx);
 	double *x = (double *) malloc(Nx);
 	double **r = alloc_2d_array(Nr + 1, Nx);
+	uint Nr_rk4 = 2;
 	// setting initial conditions
 	double r0[2] = {0, 1e-3};
 	r[0][0] = r0[0];
 	r[1][0] = r0[1];
-	// propagating solution attempt using rk4
+	// propagating solution attempt using rk4 and param for kinetic energy E.
 	uint i;
 	for (i = 0; i < Nx; i++) {
-		// rk4 call here
-		r[0][i] = *E * x[i]; // placeholder op to get to compile
+		rk4_single_2(Schrodinger1DVariableE, x[i], r, i, dx, Nr_rk4, (void *) E); // rk4 call here
 	}
 	for (i = 0; i < Nr; i++) {
 		// rk4 call here
 		r_last[i] = r[i][Nx - 1];
 	}
-	return 0;
+	return;
 } 

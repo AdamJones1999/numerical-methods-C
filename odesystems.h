@@ -5,7 +5,7 @@ void orbitalmotion(double drdt_t[], double r_t[], double t, uint Nr);
 void orbitalburn(double drdt_t[], double r_t[], double t, uint Nr);
 
 
-int Schrodinger1DVariableE(double drdx[], double x, double rcol[], uint Nr, void *params);
+void Schrodinger1DVariableE(double drdx[], double rcol[], double x, uint Nr, void *E);
 
 
-int Schrodinger1D_boundary_val(double r_last[], double *E, uint Nr);
+void Schrodinger1D_boundary_val(double r_last[], double *E, uint Nr);
