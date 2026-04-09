@@ -541,6 +541,21 @@ int newton_rhapson_test(void) {
 }
 
 
+int Schrodinger1D_boundary_val_test(void) {
+	double En_guess[1] = {4.0e3};
+	double En_correct = 3760.30162; //energy levels n=1,2,3,4 [eV]: 3760.30162, 15041.2065, 33842.7146, 60164.8259
+	double target = 1e-9;
+	uint Nr = 1;
+	double *En_solved = newton_rhapson(Schrodinger1D_boundary_val, En_guess, target, Nr);
+	double err = fabs(*En_solved / En_correct - 1) * 100;
+	if (err > 1e-5) {
+		printf("ERROR: numerical solution to energy level E: %f is %f %% off of correct E: %f\n", *En_solved, err, En_correct);
+	}
+	printf("E_solved = %f eV\n", *En_solved);
+	return 0;
+}
+
+
 int run_test(int (*test)(void), char *test_name) {
 	printf("--------\nSTARTING test: %s.\n", test_name);
 	int result = test();
@@ -572,6 +587,7 @@ int main(void) {
 	run_test(cblas_dnrm2_test, "testing if I installed cblas library properly");
 	run_test(lapacke_dgesv_test, "see if I can use LAPACKE_dgesv() properly");
 	run_test(newton_rhapson_test, "Newton Rhapson method test on two equtn non-linear system.");
+	run_test(Schrodinger1D_boundary_val_test, "Newton Rhapson combined with rk4 to solve boundary value problem of 1D time indep. Schrodinger equation.");
 	// //////////////// END TESING ////////////////
 	
 	return 0;
