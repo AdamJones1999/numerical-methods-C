@@ -99,7 +99,7 @@ def Schrodinger1DVariableE(x, rcol, Nr):
 		return drdt
 
 """
-r_last: the last element of the rk4 propagation
+r_last: the last column of the rk4 propagation
 E: 1x1 ndarray containing only E: the kinetic energy guess [eV]
 Nr: number of variables that should be 1 because we are concerned with just the initial energy
 """
