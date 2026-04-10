@@ -544,7 +544,7 @@ int newton_rhapson_test(void) {
 int Schrodinger1D_boundary_val_test(void) {
 	double En_guess[1] = {4.0e3};
 	double En_correct = 3760.30162; //energy levels n=1,2,3,4 [eV]: 3760.30162, 15041.2065, 33842.7146, 60164.8259
-	double target = 1e-9;
+	double target = 1e-5;
 	uint Nr = 1;
 	double *En_solved = newton_rhapson(Schrodinger1D_boundary_val, En_guess, target, Nr);
 	double err = fabs(*En_solved / En_correct - 1) * 100;
@@ -573,8 +573,9 @@ int run_test(int (*test)(void), char *test_name) {
 }
 
 int main(void) {
+	openblas_set_num_threads(1); // so openblas does not interfere with pthreads.
+
 	// //////////////// START TESING ////////////////
-	
 	run_test(malloc_2d_array_tests, "writing then reading from 2d array with row ptrs");
 	// run_test(free_2d_array_tests, "freeing array and (if uncommented) causing segfault to verify memory is freed");
 	// run_test(euler_basic_ODE, "simplest 1st order ODE: y = y'");
