@@ -93,7 +93,7 @@ void Schrodinger1DVariableE(double drdx[], double rcol[], double x, uint Nr, voi
 	double V = 0; // potential
 	// double E = ((double *) E)[0]; // must know type of pointer before doing ptr arithmetic on it.
 	drdx[0] = rcol[1];
-	drdx[1] = 2 * m / pow(h_bar, 2) * (V - ((double *) E)[0]) * rcol[0];
+	drdx[1] = 1e-12 * 2 * m / pow(h_bar, 2) * (V - ((double *) E)[0]) * rcol[0];
 	return;
 }
 
@@ -110,10 +110,15 @@ void Schrodinger1D_boundary_val(double r_last[], double E[], uint Nr) {
 		exit(1);
 	}
 	double x0 = 0;
-	double dx = 5e-17; // 5e-17 is lowest I could get with L = 1e-11 before i got a segfault after a few seconds (long time) from what I assume is a memory overrun caused by too many iterations due to some numerical precision issue involving dividing/multiplying by very small numbers.
-	double xf = 1e-11;
+	double dx = 1e-12; // 5e-17 is lowest I could get with L = 1e-11 before i got a segfault after a few seconds (long time) from what I assume is a memory overrun caused by too many iterations due to some numerical precision issue involving dividing/multiplying by very small numbers.
+	double xf = 1e-5;
+	// generate x array of positions
 	uint Nx = (uint) floor((xf - x0) / dx);
-	double *x = (double *) malloc(Nx);
+	double *x = (double *) malloc(Nx * sizeof(double));
+	uint i;
+	for (i = 0; i < Nx; i++) {
+		x[i] = i * dx;
+	}
 	double **r = alloc_2d_array(Nr + 1, Nx);
 	uint Nr_rk4 = 2;
 	// setting initial conditions
@@ -121,7 +126,6 @@ void Schrodinger1D_boundary_val(double r_last[], double E[], uint Nr) {
 	r[0][0] = r0[0];
 	r[1][0] = r0[1];
 	// propagating solution attempt using rk4 and param for kinetic energy E.
-	uint i;
 	for (i = 0; i < Nx; i++) {
 		rk4_single_2(Schrodinger1DVariableE, x[i], r, i, dx, Nr_rk4, (void *) E); // rk4 call here
 	}
