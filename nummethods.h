@@ -87,6 +87,10 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 	double perturb, uint Nr);
 
 
+double **jacobian_mt(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
+	double perturb, uint Nr);
+
+
 double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double target, uint Nr);
 
 

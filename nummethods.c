@@ -249,6 +249,35 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 }
 
 
+double **jacobian_mt(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
+	double perturb, uint Nr) {
+	double *f_r = malloc(Nr * sizeof(double));
+	double *f_perturbed = malloc(Nr * sizeof(double));
+	double *r_perturbed = malloc(Nr * sizeof(double));
+	memcpy(r_perturbed, r, (size_t) Nr * sizeof(double));
+	f(f_r, r, Nr); // compute <f_r> unperturbed evaluation of function.
+	uint j; uint i;
+
+	// loop to be replaced with loop creating threads that compute one column of jacobian each
+	for (j = 0; j < Nr; j++) { 
+		// START OF work done in each thread ----------------------------------
+		r_perturbed[j] += perturb; // perturb a single variable
+		f(f_perturbed, r_perturbed, Nr); // compute <f_perturbed> where one var r[j] in <r> is perturbed
+		// compute each element in column of jacobian
+		for (i = 0; i < Nr; i++) {
+			jacob_mat[i][j] = (f_perturbed[i] - f_r[i]) / perturb;
+		}
+		// END OF work done in each thread ----------------------------------
+		r_perturbed[j] -= perturb; // not necessary in multithreaded case.
+	}
+
+	free(f_r);
+	free(f_perturbed);
+	free(r_perturbed);
+	return jacob_mat;
+}
+
+
 double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double target, uint Nr) {
 	if (target <= 0) {
 		printf("ERROR in newton_rhapson() arg: 'target' must be > 0\n");
