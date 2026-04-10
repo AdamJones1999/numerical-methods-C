@@ -104,7 +104,6 @@ double **rk4_single(void (*drdt_f)(double *, double *, double, uint), \
 }
 
 
-
 double **rk4_single_2(void (*drdt_f)(double *, double *, double, uint, void *), \
 	double t, double **r, uint j_r, double dt, uint Nr, void *params) {
 	double dt_mp = 0.5 * dt;
@@ -265,6 +264,7 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 	// double max_err = target + 1.0; // highest error of all roots. starts higher than target so while loop is entered.
 	int info; // info for result of LAPACKE_dgesv
 	uint converged = 0; // convergence flag
+	uint n_iters = 0; // performance tracking
 	uint i;
 	uint j;
 	/*
@@ -275,9 +275,13 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 	into <f_r> each iteration.
 	*/
 	while (!converged) { // max_err > target
+		for (i = 0; i < Nr; i++) {
+			printf("r_guess[%d] = %f.\n", i, r_guess[i]);
+		}
 		converged = 1;
 		f(f_r, r_guess, Nr); // compute <f(<r>)>
 		jacobian(f, jacob, r_guess, perturb, Nr); // compute jacobian J(<f(<r>)>)
+		// printf("jacob[0][0]= %f\n", jacob[0][0]);
 		info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, (int) Nr, 1, jacob[0], (int) Nr, ipiv, f_r, 1); // solve del(<f>)*<dx> = <f(<r_guess>)>
 		if (info < 0) {
 			printf("LAPACKE_dgesv failed. info=%d.\n", info);
@@ -297,7 +301,9 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 			}
 			i += 1;
 		}
+		n_iters += 1;  // performance tracking
 	}
+	printf("newton rhapson method converged after %d iterations.\n", n_iters); // performance tracking
 	free(f_r);
 	free_2d_array((void **) jacob);
 	free(dr);
