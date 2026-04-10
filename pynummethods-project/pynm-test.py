@@ -252,7 +252,7 @@ if __name__=="__main__":
 	jacobian_test()
 
 	# newton rhapson test
-	# newton_rhapson_test()
+	newton_rhapson_test()
 
 	# Schrodinger1DFixedE test
 	# x, r, dx, Nx = Schrodinger1DFixedE_test()
