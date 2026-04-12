@@ -3,6 +3,19 @@ function declarations for numerical methods library
 */
 
 /*
+data to give each jacobian thread.
+*/
+typedef struct {
+	void (*f)(double *, double *, uint); // function <f> to compute perturbed jacobian
+	double **jacob; // pointer to jacobian that every thread write to different columns of
+	double *f_r; // result of evaluation of unperturbed function at <r>.
+	uint j; // index of column to put the result in.
+	uint Nr; // number of variables and number of elements in <f_r>
+	double perturb; // amount to perturb each var in <r> by one at a time.
+} Jacmt_data, *Jacmt_data_p;
+
+
+/*
 @description:
 	this function allocates a 2D array of doubles (TODO: test if type agnostic works) as one block of memory for the array data, then another block of memory to store the pointers to each row in the main block of memory. This function handles assigning the pointers in the pointer block to the correct addresses in the main block of memory.  
 
@@ -85,6 +98,9 @@ double **midpoint_single(void (*drdt_f)(double *, double *, double, uint), \
 
 double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
 	double perturb, uint Nr);
+
+
+void *jacobian_mt_calc_column(void *jacobian_data);
 
 
 double **jacobian_mt(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
