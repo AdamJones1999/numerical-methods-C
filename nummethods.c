@@ -6,6 +6,7 @@
 #include <nummethods.h>
 #include <cblas.h>
 #include <lapacke.h>
+#include <pthread.h>
 
 // allocates one block of memory for array data and then a 
 // vector of row pointers.
@@ -248,29 +249,70 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 	return jacob_mat;
 }
 
+/*
+calculates a column of jacobian in place
+*/
+void *jacobian_mt_calc_column(void *jacobian_data) {
+	Jacmt_data *jacdata_p = (Jacmt_data *) jacobian_data;
+	double *r_perturbed = malloc(jacdata_p->Nr * sizeof(double));
+	double *f_perturbed = malloc(jacdata_p->Nr * sizeof(double));
+
+	r_perturbed[jacdata_p->j] += jacdata_p->perturb; // perturb a single variable
+	jacdata_p->f(f_perturbed, r_perturbed, jacdata_p->Nr); // compute <f_perturbed> where one var r[j] in <r> is perturbed
+	// compute each element in column of jacobian
+	uint i;
+	for (i = 0; i < jacdata_p->Nr; i++) {
+		jacdata_p->jacob[i][jacdata_p->j] = (f_perturbed[i] - jacdata_p->f_r[i]) / jacdata_p->perturb;
+	}
+	free(r_perturbed);
+	free(f_perturbed);
+	return NULL;
+}
+
 
 double **jacobian_mt(void (*f)(double *, double *, uint), double **jacob_mat, double r[], \
 	double perturb, uint Nr) {
-	double *f_r = malloc(Nr * sizeof(double));
-	double *f_perturbed = malloc(Nr * sizeof(double));
-	double *r_perturbed = malloc(Nr * sizeof(double));
+	double *f_r = malloc(Nr * sizeof(double)); 
+	double *f_perturbed = malloc(Nr * sizeof(double)); // <f> evaled with one el in <r> perturbed
+	double *r_perturbed = malloc(Nr * sizeof(double)); // <r>  with one el perturbed
 	memcpy(r_perturbed, r, (size_t) Nr * sizeof(double));
-	f(f_r, r, Nr); // compute <f_r> unperturbed evaluation of function.
-	uint j; uint i;
+	pthread_t *thread_ids = malloc(Nr * sizeof(pthread_t));
+	Jacmt_data *thread_data = malloc(Nr * sizeof(Jacmt_data));
 
+	// each thread must be given or create it's own r_perturbed, idk which yet.
+
+	// initialize thread data and create threads
+	f(f_r, r, Nr); // compute <f_r> unperturbed evaluation of function used by all threads.
+	uint j;
+	int status;
+	for (j = 0; j < Nr; j++) {
+		thread_data[j].f = *f;
+		thread_data[j].jacob = jacob_mat;
+		thread_data[j].f_r = f_r;
+		thread_data[j].j = j;
+		thread_data[j].perturb = perturb;
+		thread_data[j].Nr = Nr;
+		status = pthread_create(&thread_ids[j], NULL, jacobian_mt_calc_column, (void *) &thread_data[j]);
+		if (status != 0) {
+			printf("ERROR in jacobian_mt(): creation of thread %d failed with status %ld.\n", j, thread_ids[j]);
+		}
+	}
+
+	// uint i;
 	// loop to be replaced with loop creating threads that compute one column of jacobian each
-	for (j = 0; j < Nr; j++) { 
-		// START OF work done in each thread ----------------------------------
+	// for (j = 0; j < Nr; j++) {
+		/* START OF work done in each thread ----------------------------------
 		r_perturbed[j] += perturb; // perturb a single variable
 		f(f_perturbed, r_perturbed, Nr); // compute <f_perturbed> where one var r[j] in <r> is perturbed
 		// compute each element in column of jacobian
 		for (i = 0; i < Nr; i++) {
 			jacob_mat[i][j] = (f_perturbed[i] - f_r[i]) / perturb;
 		}
-		// END OF work done in each thread ----------------------------------
-		r_perturbed[j] -= perturb; // not necessary in multithreaded case.
-	}
+		*/ // END OF work done in each thread ----------------------------------
+		// r_perturbed[j] -= perturb; // not necessary in multithreaded case.
+	// }
 
+	// all threads must synchronize at this point
 	free(f_r);
 	free(f_perturbed);
 	free(r_perturbed);
