@@ -10,3 +10,4 @@ nummethods.c
 nummethods.h
 linearsystems.c
 linearsystems.h
+plot.sh
