@@ -5,3 +5,5 @@ pyrightconfig.json
 pynummethods-project/__pycache__/*
 __pycache__/*
 run.sh
+nummethods-test.*
+linearsystems.*
