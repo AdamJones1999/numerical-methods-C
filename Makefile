@@ -27,9 +27,11 @@ make-dir:
 
 OBJS = $(OBJ_DIR)/nummethods.o $(OBJ_DIR)/nummethods-test.o $(OBJ_DIR)/odesystems.o $(OBJ_DIR)/linearsystems.o
 
+# linking step
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LFLAGS)
 
+# building object files 
 $(OBJ_DIR)/nummethods-test.o: \
 $(SRC_DIR)/nummethods-test.c \
 $(SRC_DIR)/nummethods.c $(SRC_DIR)/nummethods.h \
