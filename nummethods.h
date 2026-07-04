@@ -2,17 +2,27 @@
 function declarations for numerical methods library 
 */
 
-/*
-data to give each jacobian thread.
-*/
+/* data to give each jacobian thread. */
 typedef struct {
-	void (*f)(double *, double *, uint); // function <f> to compute perturbed jacobian
-	double **jacob; // pointer to jacobian that every thread write to different columns of
-	double *f_r; // result of evaluation of unperturbed function at <r>.
+	pthread_t thread_id; // id of thread for this column
 	uint j; // index of column to put the result in.
 	uint Nr; // number of variables and number of elements in <f_r>
 	double perturb; // amount to perturb each var in <r> by one at a time.
-} Jacmt_data, *Jacmt_data_p;
+	void (*f)(double *, double *, uint); // function <f> to compute perturbed jacobian
+	double **jacob; // pointer to jacobian that every thread write to different columns of
+	double *f_r; // result of evaluation of unperturbed function at <r>.
+} Jacmt_data_t;
+
+
+/* data that defines barrier struct */
+typedef struct {
+	pthread_mutex_t mutex;
+	pthread_cond_t cv;
+	uint valid; // numeric code that acts as key to allow barrier to be used
+	uint waiters; // number of threads waiting at
+	uint capacity; // max capacity of threads at barrier
+	uint cycle; // increments as number of barrier cycles increases
+} barrier_t;
 
 
 /*
