@@ -250,10 +250,10 @@ double **jacobian(void (*f)(double *, double *, uint), double **jacob_mat, doubl
 }
 
 /*
-calculates a column of jacobian in place
+called from thread to calculate a column of jacobian in place
 */
 void *jacobian_mt_calc_column(void *jacobian_data) {
-	Jacmt_data *jacdata_p = (Jacmt_data *) jacobian_data;
+	Jacmt_data_t *jacdata_p = (Jacmt_data_t *) jacobian_data;
 	double *r_perturbed = malloc(jacdata_p->Nr * sizeof(double));
 	double *f_perturbed = malloc(jacdata_p->Nr * sizeof(double));
 
@@ -277,7 +277,7 @@ double **jacobian_mt(void (*f)(double *, double *, uint), double **jacob_mat, do
 	double *r_perturbed = malloc(Nr * sizeof(double)); // <r>  with one el perturbed
 	memcpy(r_perturbed, r, (size_t) Nr * sizeof(double));
 	pthread_t *thread_ids = malloc(Nr * sizeof(pthread_t));
-	Jacmt_data *thread_data = malloc(Nr * sizeof(Jacmt_data));
+	Jacmt_data_t *thread_data = malloc(Nr * sizeof(Jacmt_data_t));
 
 	// each thread must be given or create it's own r_perturbed, idk which yet.
 
@@ -330,7 +330,7 @@ double *newton_rhapson(void (*f)(double *, double *, uint), double *r0, double t
 	double **jacob = (double **) alloc_2d_array(Nr, Nr); // jacobian
 	double *r_guess = (double *) malloc(Nr * sizeof(double));
 	double *dr = (double *) malloc(Nr * sizeof(double));
-	int *ipiv = (int *) malloc(Nr * sizeof(double));
+	int *ipiv = (int *) malloc(Nr * sizeof(int));
 	memcpy(r_guess, r0, (size_t) Nr * sizeof(double));
 	// double max_err = target + 1.0; // highest error of all roots. starts higher than target so while loop is entered.
 	int info; // info for result of LAPACKE_dgesv
