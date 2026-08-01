@@ -75,7 +75,7 @@ void orbitalmotion(double drdt_t[], double r_t[], double t, uint Nr) {
 }
 
 /*
-1D time independent shrodinger equation with E as an element in rcol.
+1D time independent shrodinger equation that computes velocity and acceleration (drdx0[], drdx[1] respectively) from two recast 1st order ODE's that describe the 2nd order schrodinger equation. Argument E is the kinetic energy of the particle in the potential well and is the only argument to the schrodinger equation a pointer to an energy level that is used as as an element in rcol.
 ONLY to be used within Schrodinger1D_boundary_val
 x: independent variable
 rcol: [0]: psi, [1]: phi (d(psi)dx), [2]: Kinetic energy 
@@ -90,10 +90,9 @@ void Schrodinger1DVariableE(double drdx[], double rcol[], double x, uint Nr, voi
 	}
 	double h_bar = 6.582119569e-16; // [eV*s] reduced qplanck constant
 	double m = 0.51099895069e6 / 8.9875517874e16; // [m_electron/c^2] = [eV/(m/s)^2]
-	double V = 0; // potential
-	// double E = ((double *) E)[0]; // must know type of pointer before doing ptr arithmetic on it.
+	double V = 0; // potential energy of particle inside of the well
 	drdx[0] = rcol[1];
-	drdx[1] = 1e-12 * 2 * m / pow(h_bar, 2) * (V - ((double *) E)[0]) * rcol[0];
+	drdx[1] = 1e-18 * 2 * m / pow(h_bar, 2) * (V - ((double *) E)[0]) * rcol[0]; // 1e-18 factor is for converting from unitless metric prefix to nanometer (nm) metric prefix
 	return;
 }
 
@@ -110,8 +109,8 @@ void Schrodinger1D_boundary_val(double r_last[], double E[], uint Nr) {
 		exit(1);
 	}
 	double x0 = 0;
-	double dx = 1e-12; // 5e-17 is lowest I could get with L = 1e-11 before i got a segfault after a few seconds (long time) from what I assume is a memory overrun caused by too many iterations due to some numerical precision issue involving dividing/multiplying by very small numbers.
-	double xf = 1e-5;
+	double dx = 5e-10; // [nm] 5e-17 is lowest I could get with L = 1e-11 before i got a segfault after a few seconds (long time) from what I assume is a memory overrun caused by too many iterations due to some numerical precision issue involving dividing/multiplying by very small numbers.
+	double xf = 1e-2; // [nm]
 	// generate x array of positions
 	uint Nx = (uint) floor((xf - x0) / dx);
 	double *x = (double *) malloc(Nx * sizeof(double));
