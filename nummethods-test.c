@@ -7,6 +7,14 @@
 #include <linearsystems.h>
 #include <cblas.h>
 #include <lapacke.h>
+#include <string.h> // mt jacobian only
+#include <pthread.h> //mt jacobian only (TODO: move this to nummethods.c)
+
+// mt jacobian macros
+#define N_FUNCS     4 // n jacobian rows
+#define N_VARS      4 // n jacobian columns
+#define NTHREADS    4 // numworker-threads
+#define JAC_PERTURB 1e-6  // jacobian euler step size
 
 
 int malloc_2d_array_tests(void) {
@@ -492,6 +500,44 @@ int jacobian_test(void) {
 	return 0;
 }
 
+int jacobian_test_2(void) {
+	uint Nr = 4;
+	double **jacob = alloc_2d_array(Nr, Nr);
+	double correct_jacob[4][4] = {{4.0,  5.0, -2.0, 2.0}, {-1.0, -4.0, 6.0, 3.0}, {-5, 8.0, -6.0, 8.0}, {1.0, 2.0, 3.0, 4.0}};
+	double r0[4] = {5.0, 4.0, 3.0, 2.0};
+	
+	printf("initial root vector <r> guess r0: [%f, %f, %f, %f]\n", r0[0], r0[1], r0[2], r0[3]);
+	double perturb = 0.01; // perturbation for forward difference;
+	jacobian(Jac_test_ls, jacob, r0, perturb, Nr);
+
+	// verifyinng jacobian correctness
+	printf("calculated jacobian:\n[ %f, %f, %f, %f;\n %f, %f, %f, %f;\n %f, %f, %f, %f;\n %f, %f, %f, %f ]\n", \
+		jacob[0][0], jacob[0][1], jacob[0][2], jacob[0][3], \
+		jacob[1][0], jacob[1][1], jacob[1][2], jacob[1][3], \
+		jacob[2][0], jacob[2][1], jacob[2][2], jacob[2][3], \
+		jacob[3][0], jacob[3][1], jacob[3][2], jacob[3][3] \
+		);
+	printf("correct jacobian:\n[ %f, %f, %f, %f;\n %f, %f, %f, %f;\n %f, %f, %f, %f;\n %f, %f, %f, %f ]\n", \
+		correct_jacob[0][0], correct_jacob[0][1], correct_jacob[0][2], correct_jacob[0][3], \
+		correct_jacob[1][0], correct_jacob[1][1], correct_jacob[1][2], correct_jacob[1][3], \
+		correct_jacob[2][0], correct_jacob[2][1], correct_jacob[2][2], correct_jacob[2][3], \
+		correct_jacob[3][0], correct_jacob[3][1], correct_jacob[3][2], correct_jacob[3][3] \
+		);
+	
+	uint i; uint j;
+	for (i = 0; i < Nr; i++) {
+		for (j = 0; j < Nr; j++) {
+			if (fabs(jacob[i][j] - correct_jacob[i][j]) > 1e-6) {
+				printf("incorrect jacobian element at el [%d][%d]: %f\n", i, j, jacob[i][j]);
+				return -1;
+			}
+		}
+	}
+	printf("JACOBIAN PASSED\n");
+	return 0;
+}
+
+/* test: computing a norm of a 2 el vector */
 int cblas_dnrm2_test(void) {
 	double v[] = {5.0,12.0};
 	double norm = cblas_dnrm2(2, v, 1);
@@ -504,6 +550,7 @@ int cblas_dnrm2_test(void) {
 	return 0;
 }
 
+/* test: solving 4 linear equations */
 int lapacke_dgesv_test(void) {
 	int n = 4;
 	double A[16] = {4.0, 5.0, -2.0, 2.0, -1.0, -4.0, 6.0, 3.0, -5.0, 8.0, -6.0, 8.0, 1.0, 2.0, 3.0, 4.0};
@@ -548,7 +595,7 @@ int Schrodinger1D_boundary_val_test(void) {
 	uint Nr = 1;
 	double *En_solved = newton_rhapson(Schrodinger1D_boundary_val, En_guess, target, Nr);
 	double err = fabs(*En_solved / En_correct - 1) * 100;
-	if (err > 1e-5) {
+	if (err > 1e-6) {
 		printf("ERROR: numerical solution to energy level E: %f is %f %% off of correct E: %f\n", *En_solved, err, En_correct);
 	}
 	printf("E_solved = %f eV\n", *En_solved);
@@ -572,6 +619,7 @@ int run_test(int (*test)(void), char *test_name) {
 	return 0;
 }
 
+
 int main(void) {
 	openblas_set_num_threads(1); // so openblas does not interfere with pthreads.
 
@@ -584,12 +632,16 @@ int main(void) {
 	run_test(rk4_test, "rk4 prelim test");
 	run_test(rk4_orbitalmotion_test, "rk4 hohmann ordbitalmotion model test");
 	run_test(rk4_orbitalburn_test, "rk4 hohmann ordbitalburn model test");
+
 	run_test(jacobian_test, "jacobian test on system of two non-linear equations of 2 variables");
+	run_test(jacobian_test_2, "jacobian test 2 on system of four linear equations of 4 variables");
+	
 	run_test(cblas_dnrm2_test, "testing if I installed cblas library properly");
 	run_test(lapacke_dgesv_test, "see if I can use LAPACKE_dgesv() properly");
 	run_test(newton_rhapson_test, "Newton Rhapson method test on two equtn non-linear system.");
 	run_test(Schrodinger1D_boundary_val_test, "Newton Rhapson combined with rk4 to solve boundary value problem of 1D time indep. Schrodinger equation.");
+
 	// //////////////// END TESING ////////////////
-	
-	return 0;
+
+    return 0;
 }
